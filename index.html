@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ExploreMath — Math · Physics · Robotics</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07090f;--surface:#0e1118;--s2:#151b27;--s3:#1c2436;
+  --accent:#7c6dfa;--a2:#3dd6f5;--green:#2de8a2;--orange:#ff8c42;--red:#ff5e6d;
+  --text:#eef0f6;--muted:#68768a;--border:#1f2d42;
+  --font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;overflow-x:hidden}
+nav{position:fixed;top:0;left:0;right:0;z-index:990;padding:0 1.5rem;height:68px;
+  display:flex;align-items:center;justify-content:space-between;gap:.5rem;
+  background:rgba(7,9,15,.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.logo{font-family:var(--font-head);font-size:1.55rem;font-weight:900;cursor:pointer;flex-shrink:0;
+  background:linear-gradient(120deg,var(--accent),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo b{-webkit-text-fill-color:var(--green);font-weight:900}
+.nav-r{display:flex;align-items:center;justify-content:space-between;flex:1;gap:.3rem;min-width:0}
+.nav-links-group{display:flex;align-items:center;gap:.2rem;overflow:hidden;flex:1}
+.nav-right-group{display:flex;align-items:center;gap:.4rem;flex-shrink:0}
+.nbtn{background:none;border:none;color:var(--muted);font-family:var(--font-body);font-size:.85rem;
+  font-weight:500;padding:.45rem .9rem;border-radius:8px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.nbtn:hover,.nbtn.on{color:var(--text);background:var(--s2)}
+.nbtn.admin-on{background:linear-gradient(120deg,var(--accent),var(--a2))!important;color:#fff!important;font-weight:700!important}
+.admin-btn{
+  background:rgba(124,109,250,.12)!important;border:1.5px solid rgba(124,109,250,.3)!important;
+  color:var(--accent)!important;font-weight:700!important;flex-shrink:0;
+}
+.admin-btn:hover{background:rgba(124,109,250,.22)!important;border-color:var(--accent)!important;}
+.admin-btn.admin-on{background:linear-gradient(120deg,var(--accent),var(--a2))!important;border-color:transparent!important;color:#fff!important;}
+.hero{padding:130px 2.5rem 70px;max-width:960px;margin:0 auto;position:relative}
+.hero::before{content:'';position:absolute;top:60px;left:-100px;width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle,rgba(124,109,250,.1) 0%,transparent 65%);pointer-events:none}
+.badge{display:inline-flex;align-items:center;gap:.4rem;background:var(--s2);border:1px solid var(--border);
+  border-radius:100px;padding:.3rem 1rem;font-size:.72rem;color:var(--a2);margin-bottom:1.6rem;
+  text-transform:uppercase;letter-spacing:.1em;font-weight:600}
+.hero h1{font-family:var(--font-head);font-size:clamp(2.8rem,6vw,5rem);font-weight:900;line-height:1.02;margin-bottom:1.2rem}
+.grad{background:linear-gradient(120deg,var(--accent),var(--a2),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:1.1rem;color:var(--muted);max-width:480px;line-height:1.7;margin-bottom:2.5rem}
+.hbtns{display:flex;gap:.9rem;flex-wrap:wrap}
+.bp{background:linear-gradient(120deg,var(--accent),var(--a2));color:#fff;border:none;
+  padding:.85rem 2rem;border-radius:12px;font-family:var(--font-body);font-size:.95rem;font-weight:600;
+  cursor:pointer;transition:all .3s;box-shadow:0 4px 24px rgba(124,109,250,.35)}
+.bp:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(124,109,250,.5)}
+.bo{background:transparent;border:1.5px solid var(--border);color:var(--text);
+  padding:.85rem 2rem;border-radius:12px;font-family:var(--font-body);font-size:.95rem;font-weight:500;cursor:pointer;transition:all .2s}
+.bo:hover{border-color:var(--accent);color:var(--accent)}
+.tab-bar{border-bottom:1px solid var(--border);padding:0 2rem;max-width:1160px;margin:0 auto}
+.tabs{display:flex;gap:0}
+.tab{background:none;border:none;color:var(--muted);font-family:var(--font-body);font-size:.88rem;
+  font-weight:500;padding:1rem 1.3rem;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;
+  display:flex;align-items:center;gap:.4rem}
+.tab:hover{color:var(--text)}
+.tab.on{color:var(--accent);border-bottom-color:var(--accent);font-weight:700}
+.cats{display:flex;gap:.6rem;padding:1.8rem 2rem 1.5rem;flex-wrap:wrap;max-width:1160px;margin:0 auto}
+.cp{padding:.5rem 1.1rem;border-radius:100px;border:1.5px solid var(--border);background:var(--surface);
+  font-size:.83rem;cursor:pointer;transition:all .2s;font-weight:500}
+.cp:hover,.cp.on{border-color:var(--accent);color:var(--accent);background:rgba(124,109,250,.08)}
+.cp.ph:hover,.cp.ph.on{border-color:var(--a2);color:var(--a2);background:rgba(61,214,245,.08)}
+.cp.ro:hover,.cp.ro.on{border-color:var(--green);color:var(--green);background:rgba(45,232,162,.08)}
+.cont{max-width:1160px;margin:0 auto;padding:0 2rem}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);
+  border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:3rem}
+.stat{background:var(--surface);padding:1.5rem;text-align:center}
+.sn{font-family:var(--font-head);font-size:2rem;font-weight:900}
+.sn.c1{background:linear-gradient(135deg,var(--accent),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sn.c2{background:linear-gradient(135deg,var(--a2),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sn.c3{background:linear-gradient(135deg,var(--green),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sn.c4{background:linear-gradient(135deg,var(--orange),var(--red));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sl{color:var(--muted);font-size:.78rem;margin-top:.2rem}
+.sec-hd{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.5rem}
+.sec-hd h2{font-family:var(--font-head);font-size:1.4rem;font-weight:800}
+.sec-hd p{color:var(--muted);font-size:.85rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(295px,1fr));gap:1.3rem;margin-bottom:3.5rem}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:1.4rem;cursor:pointer;transition:all .28s;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2.5px;
+  background:linear-gradient(90deg,var(--cc,var(--accent)),transparent)}
+.card:hover{border-color:var(--cc,var(--accent));transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.9rem;gap:.5rem}
+.ci{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+  font-size:1.15rem;flex-shrink:0;background:rgba(124,109,250,.1)}
+.badges-row{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center}
+.ctag{font-size:.65rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:.25rem .6rem;border-radius:100px;border:1px solid}
+.tm{color:var(--accent);border-color:var(--accent);background:rgba(124,109,250,.08)}
+.tp{color:var(--a2);border-color:var(--a2);background:rgba(61,214,245,.08)}
+.tr{color:var(--green);border-color:var(--green);background:rgba(45,232,162,.08)}
+.fbadge{font-size:.62rem;font-weight:700;padding:.22rem .55rem;border-radius:6px;text-transform:uppercase;letter-spacing:.04em}
+.fb-pdf{background:rgba(255,94,109,.15);color:var(--red);border:1px solid rgba(255,94,109,.3)}
+.fb-doc{background:rgba(61,214,245,.15);color:var(--a2);border:1px solid rgba(61,214,245,.3)}
+.fb-txt{background:rgba(124,109,250,.15);color:var(--accent);border:1px solid rgba(124,109,250,.3)}
+.card h3{font-family:var(--font-head);font-size:1rem;font-weight:700;margin-bottom:.4rem;line-height:1.3}
+.card p{color:var(--muted);font-size:.84rem;line-height:1.62;margin-bottom:.9rem}
+.card-foot{display:flex;align-items:center;justify-content:space-between;font-size:.75rem;color:var(--muted)}
+.lv{padding:.17rem .5rem;border-radius:6px;background:var(--s2);font-size:.72rem}
+.admin-actions{display:flex;gap:.5rem;margin-top:.9rem}
+.dbtn{background:rgba(255,94,109,.1);border:1px solid rgba(255,94,109,.35);color:var(--red);
+  padding:.3rem .75rem;border-radius:8px;cursor:pointer;font-size:.75rem;font-family:var(--font-body);transition:all .2s}
+.dbtn:hover{background:rgba(255,94,109,.22)}
+.ex-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.4rem;transition:all .28s;position:relative;overflow:hidden}
+.ex-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2.5px;background:linear-gradient(90deg,var(--orange),var(--red))}
+.ex-card:hover{border-color:var(--orange);transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.ex-num{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;
+  background:linear-gradient(135deg,var(--orange),var(--red));color:#fff;font-weight:800;font-size:.8rem;font-family:var(--font-head);margin-bottom:.7rem}
+.diff-badge{font-size:.62rem;font-weight:700;padding:.22rem .55rem;border-radius:6px;text-transform:uppercase}
+.d1{background:rgba(45,232,162,.15);color:var(--green);border:1px solid rgba(45,232,162,.3)}
+.d2{background:rgba(255,140,66,.15);color:var(--orange);border:1px solid rgba(255,140,66,.3)}
+.d3{background:rgba(255,94,109,.15);color:var(--red);border:1px solid rgba(255,94,109,.3)}
+.solve-btn{display:inline-flex;align-items:center;gap:.4rem;margin-top:1rem;background:var(--s2);
+  border:1px solid var(--border);color:var(--muted);padding:.4rem .9rem;border-radius:8px;cursor:pointer;
+  font-size:.8rem;font-family:var(--font-body);transition:all .2s}
+.solve-btn:hover{border-color:var(--orange);color:var(--orange)}
+.solution{display:none;margin-top:1rem;padding:1rem;background:var(--s2);border:1px solid var(--border);
+  border-radius:10px;font-size:.85rem;line-height:1.7;color:var(--muted);white-space:pre-wrap}
+.solution.show{display:block}
+.empty{grid-column:1/-1;text-align:center;padding:5rem 2rem;color:var(--muted)}
+.empty .ei{font-size:3rem;margin-bottom:.8rem}
+.empty h3{font-family:var(--font-head);font-size:1.1rem;color:var(--text);margin-bottom:.4rem}
+.overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.76);
+  backdrop-filter:blur(7px);align-items:center;justify-content:center;padding:1rem}
+.overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;
+  padding:2.2rem;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;position:relative}
+.modal.wide{max-width:680px}
+.modal h2{font-family:var(--font-head);font-size:1.25rem;font-weight:800;margin-bottom:.25rem}
+.msub{color:var(--muted);font-size:.86rem;margin-bottom:1.6rem}
+.xbtn{position:absolute;top:1.1rem;right:1.1rem;background:var(--s2);border:none;color:var(--muted);
+  width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:color .2s}
+.xbtn:hover{color:var(--text)}
+.fg{margin-bottom:1.1rem}
+.fg label{display:block;font-size:.78rem;font-weight:700;margin-bottom:.35rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.fg input,.fg textarea,.fg select{width:100%;background:var(--s2);border:1.5px solid var(--border);
+  color:var(--text);padding:.7rem .95rem;border-radius:10px;font-size:.92rem;font-family:var(--font-body);transition:border-color .2s}
+.fg input:focus,.fg textarea:focus,.fg select:focus{outline:none;border-color:var(--accent)}
+.fg textarea{resize:vertical;min-height:100px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.sub-btn{width:100%;background:linear-gradient(120deg,var(--accent),var(--a2));color:#fff;border:none;
+  padding:.85rem;border-radius:12px;font-size:.95rem;font-weight:700;font-family:var(--font-body);
+  cursor:pointer;transition:all .2s;margin-top:.3rem}
+.sub-btn:hover{opacity:.9;transform:translateY(-1px)}
+.sub-btn.org{background:linear-gradient(120deg,var(--orange),var(--red))}
+.upload-zone{border:2px dashed var(--border);border-radius:12px;padding:1.5rem;text-align:center;
+  cursor:pointer;transition:all .2s;background:var(--s2)}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:rgba(124,109,250,.05)}
+.uz-ico{font-size:2rem;margin-bottom:.5rem}
+.upload-zone p{font-size:.82rem;color:var(--muted)}
+.upload-zone p b{color:var(--accent)}
+.fp{display:flex;align-items:center;gap:.7rem;padding:.7rem 1rem;background:var(--s3);
+  border:1px solid var(--border);border-radius:10px;margin-bottom:.8rem}
+.fp-ico{font-size:1.4rem}
+.fp-info{flex:1}.fp-name{font-size:.84rem;font-weight:600}.fp-sz{font-size:.75rem;color:var(--muted)}
+.fp-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:.2rem;transition:color .2s}
+.fp-del:hover{color:var(--red)}
+.or-div{display:flex;align-items:center;gap:.8rem;margin:.6rem 0 1rem;color:var(--muted);font-size:.78rem}
+.or-div::before,.or-div::after{content:'';flex:1;height:1px;background:var(--border)}
+.lock-ico{font-size:2.8rem;text-align:center;margin-bottom:.8rem}
+.lerr{color:var(--red);font-size:.82rem;margin-top:.4rem;display:none}
+.pbody{line-height:1.75;font-size:.93rem;white-space:pre-wrap;color:var(--text);margin:1rem 0}
+.ptags{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:1.2rem}
+.ptag{background:var(--s2);border:1px solid var(--border);padding:.22rem .6rem;border-radius:6px;font-size:.76rem;color:var(--muted)}
+.dl-btn{display:inline-flex;align-items:center;gap:.5rem;margin-top:1.2rem;background:var(--s2);
+  border:1.5px solid var(--border);color:var(--text);padding:.6rem 1.2rem;border-radius:10px;
+  cursor:pointer;font-size:.87rem;font-family:var(--font-body);font-weight:600;transition:all .2s;text-decoration:none}
+.dl-btn:hover{border-color:var(--accent);color:var(--accent)}
+.fab-wrap{position:fixed;bottom:2rem;right:2rem;z-index:900;display:flex;flex-direction:column;align-items:flex-end;gap:.55rem}
+.fab-menu{display:none;flex-direction:column;gap:.45rem;align-items:flex-end}
+.fab-menu.show{display:flex}
+.fmi{display:flex;align-items:center;gap:.6rem;cursor:pointer}
+.fmi-lbl{background:var(--surface);border:1px solid var(--border);padding:.38rem .8rem;border-radius:8px;font-size:.79rem;font-weight:600;white-space:nowrap}
+.fmi-ico{width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 2px 12px rgba(0,0,0,.3);transition:all .2s}
+.fmi-ico:hover{transform:scale(1.1)}
+.fmi-ico.blue{background:linear-gradient(135deg,var(--accent),var(--a2))}
+.fmi-ico.org{background:linear-gradient(135deg,var(--orange),var(--red))}
+.fab{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--a2));
+  border:none;color:#fff;font-size:1.6rem;cursor:pointer;box-shadow:0 4px 20px rgba(124,109,250,.5);
+  transition:all .28s;display:flex;align-items:center;justify-content:center}
+.fab:hover{transform:scale(1.1)}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--surface);border:1px solid var(--green);color:var(--green);padding:.7rem 1.5rem;
+  border-radius:12px;font-size:.86rem;font-weight:600;z-index:9999;transition:transform .3s;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+footer{border-top:1px solid var(--border);text-align:center;padding:2rem;color:var(--muted);font-size:.82rem;margin-top:2rem}
+footer b{color:var(--accent);font-family:var(--font-head)}
+/* ── LANG SWITCHER ── */
+.lang-switch{display:flex;align-items:center;gap:.25rem;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:.2rem;margin-left:.4rem}
+.lang-btn{background:none;border:none;color:var(--muted);font-size:.72rem;font-weight:700;padding:.28rem .6rem;border-radius:6px;cursor:pointer;transition:all .18s;letter-spacing:.04em;font-family:var(--font-body)}
+.lang-btn.on{background:linear-gradient(120deg,var(--accent),var(--a2));color:#fff}
+
+/* ── SEARCH + FILTER BAR ── */
+.toolbar{max-width:1160px;margin:0 auto;padding:.9rem 2rem .5rem;display:flex;flex-direction:column;gap:.7rem}
+.search-wrap{display:flex;align-items:center;gap:.6rem;background:var(--s2);border:1.5px solid var(--border);border-radius:14px;padding:.65rem 1rem;transition:all .2s}
+.search-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,109,250,.12)}
+.search-ico{color:var(--muted);font-size:.9rem;flex-shrink:0}
+.search-inp{flex:1;background:none;border:none;color:var(--text);font-size:.9rem;font-family:var(--font-body);outline:none}
+.search-inp::placeholder{color:var(--muted)}
+.search-clear{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.9rem;padding:.1rem;display:none}
+.search-clear.on{display:block}
+.filter-row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+.filter-group{display:flex;align-items:center;gap:.3rem}
+.filter-lbl{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);white-space:nowrap}
+.fsel{background:var(--s2);border:1.5px solid var(--border);color:var(--text);padding:.38rem .75rem;border-radius:9px;font-size:.78rem;font-family:var(--font-body);cursor:pointer;outline:none;transition:border-color .2s;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2368788a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .55rem center;padding-right:1.6rem}
+.fsel:focus{border-color:var(--accent)}
+.filter-reset{background:none;border:1px solid var(--border);color:var(--muted);padding:.35rem .75rem;border-radius:9px;font-size:.72rem;font-family:var(--font-body);cursor:pointer;transition:all .18s;font-weight:600}
+.filter-reset:hover{border-color:var(--red);color:var(--red)}
+.result-count{font-size:.78rem;color:var(--muted);padding:.1rem 2rem;max-width:1160px;margin:0 auto}
+
+@media(max-width:640px){
+  .hero h1{font-size:2.4rem}.stats{grid-template-columns:repeat(2,1fr)}
+  .frow{grid-template-columns:1fr}nav{padding:0 .8rem;height:auto;min-height:68px;flex-wrap:nowrap}
+  .tab-bar,.cats,.cont{padding-left:1rem;padding-right:1rem}
+  .nbtn span:not(.admin-label){display:none}
+  .nav-links-group .nbtn{padding:.45rem .55rem}
+  .nbtn{font-size:.8rem}
+  .lang-switch{display:none}
+}
+@media(max-width:400px){
+  .nav-links-group .nbtn:not(#nb-home):not(#nb-cours){display:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo" onclick="goHome()">Explore<b>Math</b></div>
+  <div class="nav-r">
+    <div class="nav-links-group">
+      <button class="nbtn on" id="nb-home" onclick="goHome()">🏠 <span>Home</span></button>
+      <button class="nbtn" id="nb-cours" onclick="showTab('cours')">📚 <span>Courses</span></button>
+      <button class="nbtn" id="nb-ex" onclick="showTab('exercices')">✏️ <span>Exercises</span></button>
+      <button class="nbtn" id="nb-about" onclick="showTab('about')">👤 <span>About</span></button>
+    </div>
+    <div class="nav-right-group">
+      <button class="nbtn admin-btn" id="nb-admin" onclick="adminClick()">🔐 <span class="admin-label">Admin</span></button>
+      <div class="lang-switch">
+        <button class="lang-btn on" id="lb-en" onclick="setLang('en',this)">EN</button>
+        <button class="lang-btn" id="lb-fr" onclick="setLang('fr',this)">FR</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="badge">✦ By Ilyes Jeridi</div>
+  <h1>Learn,<br><span class="grad">Explore & Innovate</span></h1>
+  <p>Math, physics, robotics lessons and interactive exercises — shared with passion.</p>
+  <div class="hbtns">
+    <button class="bp" onclick="showTab('cours')">📖 Browse Courses</button>
+    <button class="bo" onclick="showTab('exercices')">✏️ Exercises</button>
+  </div>
+</section>
+
+<div class="tab-bar">
+  <div class="tabs">
+    <button class="tab on" id="tab-cours" onclick="showTab('cours')">📚 Courses & Documents</button>
+    <button class="tab" id="tab-exercices" onclick="showTab('exercices')">✏️ Exercises</button>
+    <button class="tab" id="tab-about" onclick="showTab('about')">👤 About</button>
+  </div>
+</div>
+
+<div class="cats" id="cats-bar">
+  <div class="cp on" onclick="filter('all',this)" id="cp-all">🔢 <span class="t" data-en="All" data-fr="Tout">All</span></div>
+  <div class="cp"    onclick="filter('math',this)">📐 <span class="t" data-en="Mathematics" data-fr="Mathématiques">Mathematics</span></div>
+  <div class="cp ph" onclick="filter('physics',this)">⚛️ <span class="t" data-en="Physics" data-fr="Physique">Physics</span></div>
+  <div class="cp ro" onclick="filter('robotics',this)">🤖 <span class="t" data-en="Robotics" data-fr="Robotique">Robotics</span></div>
+</div>
+
+<!-- TOOLBAR: Search + Filters -->
+<div class="toolbar" id="toolbar">
+  <div class="search-wrap">
+    <span class="search-ico">🔍</span>
+    <input class="search-inp" id="search-inp" placeholder="Search courses, exercises, tags..." oninput="doSearch(this.value)">
+    <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
+  </div>
+  <div class="filter-row" id="filter-row">
+    <div class="filter-group">
+      <span class="filter-lbl t" data-en="Level" data-fr="Niveau">Level</span>
+      <select class="fsel" id="f-level" onchange="applyFilters()">
+        <option value="" data-en="All levels" data-fr="Tous niveaux">All levels</option>
+        <option value="Beginner" data-en="Beginner" data-fr="Débutant">Beginner</option>
+        <option value="Intermediate" data-en="Intermediate" data-fr="Intermédiaire">Intermediate</option>
+        <option value="Advanced" data-en="Advanced" data-fr="Avancé">Advanced</option>
+      </select>
+    </div>
+    <div class="filter-group" id="fg-type">
+      <span class="filter-lbl t" data-en="Type" data-fr="Type">Type</span>
+      <select class="fsel" id="f-type" onchange="applyFilters()">
+        <option value="" data-en="All types" data-fr="Tous types">All types</option>
+        <option value="pdf" data-en="PDF" data-fr="PDF">PDF</option>
+        <option value="doc" data-en="Word" data-fr="Word">Word</option>
+        <option value="text" data-en="Text" data-fr="Texte">Text</option>
+      </select>
+    </div>
+    <div class="filter-group" id="fg-diff">
+      <span class="filter-lbl t" data-en="Difficulty" data-fr="Difficulté">Difficulty</span>
+      <select class="fsel" id="f-diff" onchange="applyFilters()">
+        <option value="" data-en="All" data-fr="Tous">All</option>
+        <option value="1" data-en="Easy" data-fr="Facile">Easy</option>
+        <option value="2" data-en="Medium" data-fr="Moyen">Medium</option>
+        <option value="3" data-en="Hard" data-fr="Difficile">Hard</option>
+      </select>
+    </div>
+    <button class="filter-reset" onclick="resetFilters()" id="reset-btn">↺ <span class="t" data-en="Reset" data-fr="Réinitialiser">Reset</span></button>
+  </div>
+</div>
+<div class="result-count" id="result-count"></div>
+
+<div class="cont" id="stats-anchor">
+  <div class="stats">
+    <div class="stat"><div class="sn c1" id="s0">0</div><div class="sl">Math Courses</div></div>
+    <div class="stat"><div class="sn c2" id="s1">0</div><div class="sl">Physics Courses</div></div>
+    <div class="stat"><div class="sn c3" id="s2">0</div><div class="sl">Robotics</div></div>
+    <div class="stat"><div class="sn c4" id="s3">0</div><div class="sl">Exercises</div></div>
+  </div>
+
+  <div id="sec-cours">
+    <div class="sec-hd">
+      <h2>📚 Courses & Documents</h2>
+      <p id="flt-lbl">All publications</p>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div id="sec-about" style="display:none;max-width:760px;padding-bottom:4rem">
+    <div style="margin-bottom:3rem">
+      <div style="display:inline-flex;align-items:center;gap:.5rem;background:var(--s2);border:1px solid var(--border);border-radius:100px;padding:.3rem 1rem;font-size:.72rem;color:var(--a2);text-transform:uppercase;letter-spacing:.1em;font-weight:600;margin-bottom:1.4rem">✦ The Platform</div>
+      <h2 style="font-family:var(--font-head);font-size:2rem;font-weight:900;margin-bottom:1rem;line-height:1.15">What is<br><span style="background:linear-gradient(120deg,var(--accent),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">ExploreMath?</span></h2>
+      <p style="color:var(--muted);font-size:1rem;line-height:1.85;max-width:640px">
+        ExploreMath is a personal learning space built around curiosity. It brings together courses in mathematics, physics, and robotics — each one written to be clear, approachable, and genuinely useful. Whether you're working through foundational concepts or diving into hands-on robotics ideas, this platform is designed to make complex topics feel within reach. It's not just a collection of notes — it's a living space that grows with every new idea worth sharing.
+      </p>
+    </div>
+    <div style="height:1px;background:var(--border);margin-bottom:3rem"></div>
+    <div>
+      <div style="display:inline-flex;align-items:center;gap:.5rem;background:var(--s2);border:1px solid var(--border);border-radius:100px;padding:.3rem 1rem;font-size:.72rem;color:var(--green);text-transform:uppercase;letter-spacing:.1em;font-weight:600;margin-bottom:1.4rem">✦ The Creator</div>
+      <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.2rem">
+        <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--a2));display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0">👤</div>
+        <div>
+          <h3 style="font-family:var(--font-head);font-size:1.4rem;font-weight:900">Ilyes Jeridi</h3>
+          <p style="color:var(--muted);font-size:.85rem">Creator of ExploreMath</p>
+        </div>
+      </div>
+      <p style="color:var(--muted);font-size:1rem;line-height:1.85;max-width:640px">
+        Ilyes is someone who finds genuine joy in understanding how things work — not just in theory, but all the way down to the equations, the circuits, and the logic behind them. His passion for mathematics and physics isn't something he keeps to himself; it's something he wants to share. Robotics, for him, is where those two worlds meet in the most exciting way possible. ExploreMath is his way of putting that energy out into the world — one lesson, one idea, one exercise at a time.
+      </p>
+    </div>
+  </div>
+
+  <div id="sec-ex" style="display:none">
+    <div class="sec-hd">
+      <h2>✏️ Exercises</h2>
+      <p id="ex-lbl">Practice and strengthen your knowledge</p>
+    </div>
+    <div class="grid" id="ex-grid"></div>
+  </div>
+</div>
+
+<!-- FAB -->
+<div class="fab-wrap" id="fab-wrap" style="display:none">
+  <div class="fab-menu" id="fab-menu">
+    <div class="fmi" onclick="openForm()">
+      <span class="fmi-lbl">New course / document</span>
+      <div class="fmi-ico blue">📚</div>
+    </div>
+    <div class="fmi" onclick="openExForm()">
+      <span class="fmi-lbl">New exercise</span>
+      <div class="fmi-ico org">✏️</div>
+    </div>
+  </div>
+  <button class="fab" id="fab" onclick="toggleFab()">＋</button>
+</div>
+
+<!-- LOGIN -->
+<div class="overlay" id="ol-login">
+  <div class="modal" style="max-width:380px">
+    <button class="xbtn" onclick="close_('ol-login')">✕</button>
+    <div class="lock-ico">🔐</div>
+    <h2 style="text-align:center">Admin Space</h2>
+    <p class="msub" style="text-align:center">Reserved for ExploreMath</p>
+    <div class="fg">
+      <label>Password</label>
+      <input type="password" id="pw" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      <div class="lerr" id="lerr">❌ Password incorrect</div>
+    </div>
+    <button class="sub-btn" onclick="doLogin()">Enter</button>
+  </div>
+</div>
+
+<!-- COURS FORM -->
+<div class="overlay" id="ol-form">
+  <div class="modal">
+    <button class="xbtn" onclick="close_('ol-form')">✕</button>
+    <h2>📚 New Course</h2>
+    <p class="msub">Publish a text lesson, PDF, or Word document</p>
+    <div class="fg"><label>Title *</label><input id="ft" placeholder="E.g. Derivatives — Senior Year"></div>
+    <div class="frow">
+      <div class="fg"><label>Category</label>
+        <select id="fc">
+          <option value="math">📐 Mathematics</option>
+          <option value="physics">⚛️ Physics</option>
+          <option value="robotics">🤖 Robotics</option>
+        </select>
+      </div>
+      <div class="fg"><label>Level</label>
+        <select id="fl"><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select>
+      </div>
+    </div>
+    <div class="fg"><label>Summary *</label><input id="fs" placeholder="A short description of the lesson"></div>
+    <div class="fg">
+      <label>PDF or Word File (optional)</label>
+      <div class="upload-zone" id="uz" onclick="document.getElementById('fi').click()"
+        ondragover="event.preventDefault();this.classList.add('drag')"
+        ondragleave="this.classList.remove('drag')"
+        ondrop="handleDrop(event)">
+        <div class="uz-ico">📎</div>
+        <p><b>Click</b> or drag a file here</p>
+        <p style="font-size:.73rem;margin-top:.2rem;opacity:.7">PDF, DOC, DOCX — max 5 MB</p>
+      </div>
+      <input type="file" id="fi" accept=".pdf,.doc,.docx" style="display:none" onchange="handleFile(this.files[0])">
+      <div id="fp" style="display:none"></div>
+    </div>
+    <div class="or-div">or write the content directly</div>
+    <div class="fg"><label>Text Content</label>
+      <textarea id="fco" placeholder="Write the lesson content here..."></textarea>
+    </div>
+    <div class="fg"><label>Tags (comma-separated)</label><input id="ftg" placeholder="derivative, polynomial, high school"></div>
+    <button class="sub-btn" onclick="submitPost()">🚀 Publish Course</button>
+  </div>
+</div>
+
+<!-- EXERCICE FORM -->
+<div class="overlay" id="ol-ex-form">
+  <div class="modal">
+    <button class="xbtn" onclick="close_('ol-ex-form')">✕</button>
+    <h2>✏️ New exercise</h2>
+    <p class="msub">Add an exercise with a solution for readers</p>
+    <div class="fg"><label>Title *</label><input id="ext" placeholder="E.g. Derivative Calculation"></div>
+    <div class="frow">
+      <div class="fg"><label>Subject</label>
+        <select id="exc">
+          <option value="math">📐 Mathematics</option>
+          <option value="physics">⚛️ Physics</option>
+          <option value="robotics">🤖 Robotics</option>
+        </select>
+      </div>
+      <div class="fg"><label>Difficulty</label>
+        <select id="exd"><option value="1">⭐ Easy</option><option value="2">⭐⭐ Medium</option><option value="3">⭐⭐⭐ Hard</option></select>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Question — PDF File (optional)</label>
+      <div class="upload-zone" id="uz-eq" onclick="document.getElementById('fi-eq').click()"
+        ondragover="event.preventDefault();this.classList.add('drag')"
+        ondragleave="this.classList.remove('drag')"
+        ondrop="handleDropEx(event,'eq')">
+        <div class="uz-ico">📎</div>
+        <p><b>Click</b> or drag a PDF here</p>
+        <p style="font-size:.73rem;margin-top:.2rem;opacity:.7">PDF — max 5 MB</p>
+      </div>
+      <input type="file" id="fi-eq" accept=".pdf" style="display:none" onchange="handleFileEx(this.files[0],'eq')">
+      <div id="fp-eq" style="display:none"></div>
+    </div>
+    <div class="or-div">or write the question directly</div>
+    <div class="fg">
+      <textarea id="exq" placeholder="Write the full exercise question..."></textarea>
+    </div>
+    <div class="fg" style="margin-top:.4rem">
+      <label>Solution — PDF File (optional)</label>
+      <div class="upload-zone" id="uz-es" onclick="document.getElementById('fi-es').click()"
+        ondragover="event.preventDefault();this.classList.add('drag')"
+        ondragleave="this.classList.remove('drag')"
+        ondrop="handleDropEx(event,'es')">
+        <div class="uz-ico">📎</div>
+        <p><b>Click</b> or drag a PDF here</p>
+        <p style="font-size:.73rem;margin-top:.2rem;opacity:.7">PDF — max 5 MB</p>
+      </div>
+      <input type="file" id="fi-es" accept=".pdf" style="display:none" onchange="handleFileEx(this.files[0],'es')">
+      <div id="fp-es" style="display:none"></div>
+    </div>
+    <div class="or-div">or write the solution directly</div>
+    <div class="fg">
+      <textarea id="exs" placeholder="Write the detailed solution (optional)..."></textarea>
+    </div>
+    <div class="fg"><label>Tags</label><input id="extg" placeholder="derivative, function"></div>
+    <button class="sub-btn org" onclick="submitExercice()">🚀 Publish Exercise</button>
+  </div>
+</div>
+
+<!-- DETAIL -->
+<div class="overlay" id="ol-detail">
+  <div class="modal wide">
+    <button class="xbtn" onclick="close_('ol-detail')">✕</button>
+    <div id="detail"></div>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE -->
+<div class="overlay" id="ol-confirm">
+  <div class="modal" style="max-width:360px;text-align:center">
+    <button class="xbtn" onclick="close_('ol-confirm')">✕</button>
+    <div style="font-size:2.5rem;margin-bottom:.8rem">🗑</div>
+    <h2 style="margin-bottom:.4rem">Delete?</h2>
+    <p class="msub">This action cannot be undone.</p>
+    <div style="display:flex;gap:.8rem;justify-content:center;margin-top:1rem">
+      <button onclick="close_('ol-confirm')" class="bo" style="padding:.7rem 1.4rem;border-radius:10px">Cancel</button>
+      <button id="confirm-del" class="sub-btn" style="background:linear-gradient(120deg,var(--red),#c0392b);width:auto;padding:.7rem 1.6rem;margin:0">Delete</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>✦ <b>ExploreMath</b> — Mathématiques · Physique · Robotics</p>
+  <p style="margin-top:.5rem;font-size:.78rem">Made with passion 🚀 by <span style="color:var(--a2);font-weight:700;font-family:var(--font-head)">Ilyes Jeridi</span></p>
+</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+// ── LANGUAGE ──
+let LANG = 'en';
+const T = {
+  en: {
+    searchPlaceholder: 'Search courses, exercises, tags...',
+    searchPlaceholderEx: 'Search exercises, tags...',
+    allPub: n => `All publications (${n})`,
+    filteredPub: (lbl,n) => `${lbl} — ${n} result${n!==1?'s':''}`,
+    allEx: n => `All exercises (${n})`,
+    noCoursesAdmin: 'Click ＋ to publish',
+    noCoursesUser: 'Check back soon!',
+    noCourses: 'No courses yet',
+    noExAdmin: 'Click ＋ to add one',
+    noExUser: 'Check back soon!',
+    noEx: 'No exercises yet',
+    noResults: 'No results found',
+    noResultsSub: 'Try a different keyword or reset filters',
+    coursePublished: '🚀 Course published!',
+    exercisePublished: '✏️ Exercise published!',
+    deleted: '🗑 Deleted successfully',
+    loggedIn: '✅ Welcome, ExploreMath!',
+    loggedOut: '👋 Logged out',
+    wrongPass: '❌ Incorrect password',
+    saved: '✅ Saved!',
+    requiredFields: '⚠️ Title, summary, and content (text or file) required',
+    fileTooBig: '⚠️ File too large (max 5 MB)',
+    pdfOnly: '⚠️ PDF files only',
+    pdfDocOnly: '⚠️ PDF, DOC or DOCX only',
+    diffLabels: ['','Easy','Medium','Hard'],
+    LBL: {math:'Mathematics', physics:'Physics', robotics:'Robotics'},
+    levelAll: 'All levels', typeAll: 'All types', diffAll: 'All',
+    levels: ['Beginner','Intermediate','Advanced'],
+    filterLevel: 'Level', filterType: 'Type', filterDiff: 'Difficulty',
+    resetBtn: '↺ Reset',
+    mathTab: '📐 Mathematics', physTab: '⚛️ Physics', robTab: '🤖 Robotics',
+    allTab: '🔢 All',
+    coursesTab: '📚 Courses & Documents', exTab: '✏️ Exercises', aboutTab: '👤 About',
+    homeBtn: '🏠 Home', coursesBtn: '📚 Courses', exBtn: '✏️ Exercises', aboutBtn: '👤 About',
+    adminBtn: '🔐 Admin',
+    // form labels
+    newCourse: '📚 New Course', newEx: '✏️ New Exercise',
+    publishCourse: '🚀 Publish Course', publishEx: '🚀 Publish Exercise',
+  },
+  fr: {
+    searchPlaceholder: 'Rechercher cours, exercices, tags...',
+    searchPlaceholderEx: 'Rechercher exercices, tags...',
+    allPub: n => `Toutes les publications (${n})`,
+    filteredPub: (lbl,n) => `${lbl} — ${n} résultat${n>1?'s':''}`,
+    allEx: n => `Tous les exercices (${n})`,
+    noCoursesAdmin: 'Clique ＋ pour publier',
+    noCoursesUser: 'Reviens bientôt !',
+    noCourses: 'Aucun cours',
+    noExAdmin: 'Clique ＋ pour ajouter',
+    noExUser: 'Reviens bientôt !',
+    noEx: 'Aucun exercice',
+    noResults: 'Aucun résultat',
+    noResultsSub: 'Essaie un autre mot-clé ou réinitialise les filtres',
+    coursePublished: '🚀 Cours publié !',
+    exercisePublished: '✏️ Exercice publié !',
+    deleted: '🗑 Supprimé avec succès',
+    loggedIn: '✅ Bienvenue, ExploreMath !',
+    loggedOut: '👋 Déconnecté',
+    wrongPass: '❌ Mot de passe incorrect',
+    saved: '✅ Sauvegardé !',
+    requiredFields: '⚠️ Titre, résumé et contenu requis',
+    fileTooBig: '⚠️ Fichier trop grand (max 5 MB)',
+    pdfOnly: '⚠️ PDF uniquement',
+    pdfDocOnly: '⚠️ PDF, DOC ou DOCX uniquement',
+    diffLabels: ['','Facile','Moyen','Difficile'],
+    LBL: {math:'Mathématiques', physics:'Physique', robotics:'Robotique'},
+    levelAll: 'Tous niveaux', typeAll: 'Tous types', diffAll: 'Tous',
+    levels: ['Débutant','Intermédiaire','Avancé'],
+    filterLevel: 'Niveau', filterType: 'Type', filterDiff: 'Difficulté',
+    resetBtn: '↺ Réinitialiser',
+    mathTab: '📐 Mathématiques', physTab: '⚛️ Physique', robTab: '🤖 Robotique',
+    allTab: '🔢 Tout voir',
+    coursesTab: '📚 Cours & Documents', exTab: '✏️ Exercices', aboutTab: '👤 À propos',
+    homeBtn: '🏠 Accueil', coursesBtn: '📚 Cours', exBtn: '✏️ Exercices', aboutBtn: '👤 À propos',
+    adminBtn: '🔐 Admin',
+    newCourse: '📚 Nouveau cours', newEx: '✏️ Nouvel exercice',
+    publishCourse: '🚀 Publier le cours', publishEx: "🚀 Publier l'exercice",
+  }
+};
+
+function setLang(lang, el) {
+  LANG = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  applyLangUI();
+  renderPosts(); renderEx();
+}
+
+function applyLangUI() {
+  const t = T[LANG];
+  // Search placeholder
+  const si = document.getElementById('search-inp');
+  if (si) si.placeholder = t.searchPlaceholder;
+  // Filter selects options text
+  const fl = document.getElementById('f-level');
+  if (fl) {
+    fl.options[0].textContent = t.levelAll;
+    fl.options[1].textContent = t.levels[0];
+    fl.options[2].textContent = t.levels[1];
+    fl.options[3].textContent = t.levels[2];
+  }
+  const ft = document.getElementById('f-type');
+  if (ft) ft.options[0].textContent = t.typeAll;
+  const fd = document.getElementById('f-diff');
+  if (fd) { fd.options[0].textContent = t.diffAll; fd.options[1].textContent = t.diffLabels[1]; fd.options[2].textContent = t.diffLabels[2]; fd.options[3].textContent = t.diffLabels[3]; }
+  // filter labels
+  document.querySelectorAll('.filter-lbl').forEach(el => {
+    const key = el.dataset.key;
+    if (key && t[key]) el.textContent = t[key];
+  });
+  // tabs
+  const tc = document.getElementById('tab-cours');
+  const te = document.getElementById('tab-exercices');
+  const ta = document.querySelector('#app > div > div.tabs > button:nth-child(3)');
+  if (tc) tc.textContent = t.coursesTab;
+  if (te) te.textContent = t.exTab;
+  // nav buttons
+  const nc = document.getElementById('nb-cours');
+  const ne = document.getElementById('nb-ex');
+  const nab = document.getElementById('nb-about');
+  if (nc) nc.innerHTML = t.coursesBtn;
+  if (ne) ne.innerHTML = t.exBtn;
+  if (nab) nab.innerHTML = t.aboutBtn;
+  // cat pills
+  document.querySelectorAll('.cp span.t, .filter-lbl.t, .tab .t').forEach(el => {
+    const en = el.dataset.en; const fr = el.dataset.fr;
+    if (en && fr) el.textContent = LANG === 'en' ? en : fr;
+  });
+}
+
+const PASS='exploremath2025';
+const ICO={math:'📐',physics:'⚛️',robotics:'🤖'};
+const COL={math:'#7c6dfa',physics:'#3dd6f5',robotics:'#2de8a2'};
+const LBL={math:'Mathematics',physics:'Physics',robotics:'Robotics'};
+const CLS={math:'tm',physics:'tp',robotics:'tr'};
+const DIFF_LBL=['','Easy','Medium','Hard'];
+const DIFF_CLS=['','d1','d2','d3'];
+
+let admin=false,cf='all',fabOpen=false;
+let posts=JSON.parse(localStorage.getItem('em4')||'[]');
+let exercices=JSON.parse(localStorage.getItem('em4_ex')||'[]');
+let curFile=null,curExQ=null,curExS=null;
+
+if(!posts.length){
+  posts=[
+    {id:1,title:'Introduction aux dérivées',cat:'math',summary:'Comprendre la dérivée, sa notation et ses premières applications.',
+     content:'Une dérivée mesure le taux de variation instantané d\'une fonction.\n\nExemple : Si f(x) = x², alors f\'(x) = 2x.\n\nRègles :\n• (xⁿ)\' = n·xⁿ⁻¹\n• (sin x)\' = cos x\n• (eˣ)\' = eˣ\n• (uv)\' = u\'v + uv\'\n\nApplications :\n→ Extrema : f\'(x) = 0\n→ Équation de la tangente',
+     tags:['dérivée','analyse','terminale'],level:'Intermediate',date:'15 Mar 2026',fileType:null,fileName:null,fileData:null},
+    {id:2,title:'Les lois de Newton',cat:'physics',summary:'Les trois lois fondamentales de la mécanique classique.',
+     content:'1ʳᵉ loi — Inertie :\nTout corps reste au repos ou en MRU sauf si une force agit.\n\n2ᵉ loi — Dynamique :\nΣF⃗ = m · a⃗\n\n3ᵉ loi — Réaction :\nToute action entraîne une réaction égale et opposée.',
+     tags:['Newton','mécanique','forces'],level:'Beginner',date:'14 Mar 2026',fileType:null,fileName:null,fileData:null},
+    {id:3,title:'Robot suiveur de ligne',cat:'robotics',summary:'Concevoir un robot autonome avec capteurs IR et Arduino.',
+     content:'Composants :\n• Arduino Uno\n• 2 moteurs DC + L298N\n• 2 capteurs IR\n• Châssis bois ou 3D\n\nLogique :\n→ IR gauche noir → tourner gauche\n→ IR droit noir → tourner droite\n→ Les deux blancs → avancer',
+     tags:['Arduino','capteur IR','autonome'],level:'Intermediate',date:'13 Mar 2026',fileType:null,fileName:null,fileData:null}
+  ];
+  savePosts();
+}
+if(!exercices.length){
+  exercices=[
+    {id:1,title:'Calcul d\'une dérivée',cat:'math',diff:1,
+     question:'Soit f(x) = 3x² + 2x - 5.\nCalcule f\'(x) et détermine les points où la tangente est horizontale.',
+     solution:'f\'(x) = 6x + 2\n\nTangente horizontale → f\'(x) = 0\n6x + 2 = 0  →  x = -1/3\n\nLa tangente est horizontale en x = -1/3.',
+     tags:['dérivée','polynôme'],date:'12 Mar 2026'},
+    {id:2,title:'2ᵉ loi de Newton — Application',cat:'physics',diff:2,
+     question:'Un objet de masse m = 4 kg est soumis à :\nF₁ = 10 N vers la droite\nF₂ = 6 N vers la gauche\n\nCalcule l\'accélération.',
+     solution:'ΣF = F₁ - F₂ = 10 - 6 = 4 N\n\nΣF = m·a  →  4 = 4·a  →  a = 1 m/s² (vers la droite)',
+     tags:['Newton','forces','accélération'],date:'11 Mar 2026'}
+  ];
+  saveEx();
+}
+
+function savePosts(){localStorage.setItem('em4',JSON.stringify(posts));stats();renderPosts();}
+function saveEx(){localStorage.setItem('em4_ex',JSON.stringify(exercices));stats();renderEx();}
+function stats(){
+  document.getElementById('s0').textContent=posts.filter(p=>p.cat==='math').length;
+  document.getElementById('s1').textContent=posts.filter(p=>p.cat==='physics').length;
+  document.getElementById('s2').textContent=posts.filter(p=>p.cat==='robotics').length;
+  document.getElementById('s3').textContent=exercices.length;
+}
+
+function getFilters() {
+  return {
+    cat: cf,
+    search: (document.getElementById('search-inp')?.value||'').trim().toLowerCase(),
+    level: document.getElementById('f-level')?.value||'',
+    type: document.getElementById('f-type')?.value||'',
+    diff: document.getElementById('f-diff')?.value||'',
+  };
+}
+
+function matchesSearch(item, q) {
+  if (!q) return true;
+  const haystack = [item.title||'', item.summary||'', item.content||'', item.question||'', (item.tags||[]).join(' ')].join(' ').toLowerCase();
+  return q.split(' ').every(w => haystack.includes(w));
+}
+
+function highlightText(text, q) {
+  if (!q) return text;
+  const words = q.split(' ').filter(Boolean);
+  let result = text;
+  words.forEach(w => {
+    const re = new RegExp('('+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')', 'gi');
+    result = result.replace(re, '<mark style="background:rgba(124,109,250,.3);color:var(--accent);border-radius:3px;padding:0 1px">$1</mark>');
+  });
+  return result;
+}
+
+function renderPosts(){
+  const g=document.getElementById('grid');
+  const t=T[LANG];
+  const {cat,search,level,type} = getFilters();
+  let list = [...posts].reverse();
+  if(cat!=='all') list=list.filter(p=>p.cat===cat);
+  if(level) list=list.filter(p=>{
+    const l=p.level||'';
+    const map={'Beginner':'Beginner','Intermediate':'Intermediate','Advanced':'Advanced','Débutant':'Beginner','Intermédiaire':'Intermediate','Avancé':'Advanced'};
+    return (map[l]||l)===level;
+  });
+  if(type) list=list.filter(p=>{
+    if(type==='text') return !p.fileType;
+    return p.fileType===type;
+  });
+  if(search) list=list.filter(p=>matchesSearch(p,search));
+
+  const rc=document.getElementById('result-count');
+  const fltLbl=document.getElementById('flt-lbl');
+  const lbl=cat==='all'?t.allPub(posts.length):t.filteredPub(t.LBL[cat],list.length);
+  if(fltLbl) fltLbl.textContent=lbl;
+  if(rc) rc.textContent=search||level||type?`${list.length} result${list.length!==1?'s':''} found`:'';
+
+  if(!list.length){
+    const msg=search?`<div class="empty"><div class="ei">🔍</div><h3>${t.noResults}</h3><p>${t.noResultsSub}</p></div>`:
+      `<div class="empty"><div class="ei">📭</div><h3>${t.noCourses}</h3><p>${admin?t.noCoursesAdmin:t.noCoursesUser}</p></div>`;
+    g.innerHTML=msg;return;
+  }
+  const fbTxt={pdf:`<span class="fbadge fb-pdf">📄 PDF</span>`,doc:`<span class="fbadge fb-doc">📝 Word</span>`,null:`<span class="fbadge fb-txt">📃 ${LANG==='fr'?'Texte':'Text'}</span>`};
+  const catLbl=t.LBL;
+  g.innerHTML=list.map(p=>{
+    const fb=fbTxt[p.fileType]||fbTxt[null];
+    const titleH=highlightText(p.title,search);
+    const summH=highlightText(p.summary,search);
+    return `<div class="card" style="--cc:${COL[p.cat]}" onclick="showDetail(${p.id})">
+      <div class="card-top">
+        <div class="ci">${ICO[p.cat]}</div>
+        <div class="badges-row"><span class="ctag ${CLS[p.cat]}">${catLbl[p.cat]}</span>${fb}</div>
+      </div>
+      <h3>${titleH}</h3><p>${summH}</p>
+      <div class="card-foot"><span>📅 ${p.date}</span><span class="lv">${p.level}</span></div>
+      ${admin?`<div class="admin-actions" onclick="event.stopPropagation()">
+        <button class="dbtn" onclick="confirmDel('post',${p.id})">🗑 ${LANG==='fr'?'Supprimer':'Delete'}</button>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function renderEx(){
+  const g=document.getElementById('ex-grid');
+  const t=T[LANG];
+  const {cat,search,diff}=getFilters();
+  let list=[...exercices].reverse();
+  if(cat!=='all') list=list.filter(e=>e.cat===cat);
+  if(diff) list=list.filter(e=>String(e.diff)===diff);
+  if(search) list=list.filter(e=>matchesSearch(e,search));
+
+  const exLbl=document.getElementById('ex-lbl');
+  const rc=document.getElementById('result-count');
+  if(exLbl) exLbl.textContent=cat==='all'?t.allEx(exercices.length):`${t.LBL[cat]} — ${list.length}`;
+  if(rc) rc.textContent=(search||diff)?`${list.length} result${list.length!==1?'s':''} found`:'';
+
+  if(!list.length){
+    const msg=search?`<div class="empty"><div class="ei">🔍</div><h3>${t.noResults}</h3><p>${t.noResultsSub}</p></div>`:
+      `<div class="empty"><div class="ei">✏️</div><h3>${t.noEx}</h3><p>${admin?t.noExAdmin:t.noExUser}</p></div>`;
+    g.innerHTML=msg;return;
+  }
+  const DLBL=t.diffLabels;
+  const catLbl=t.LBL;
+  let n=0;
+  g.innerHTML=list.map(e=>{n++;
+    const titleH=highlightText(e.title,search);
+    const qH=highlightText(e.question||'',search);
+    const solBtn=LANG==='fr'?'Voir la solution':'View Solution';
+    const hideBtn=LANG==='fr'?'🙈 Cacher':'🙈 Hide';
+    return `<div class="ex-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.7rem">
+        <div class="ex-num">${String(n).padStart(2,'0')}</div>
+        <div style="display:flex;gap:.4rem;flex-wrap:wrap">
+          <span class="ctag ${CLS[e.cat]}">${catLbl[e.cat]}</span>
+          <span class="diff-badge ${DIFF_CLS[e.diff]}">${DLBL[e.diff]}</span>
+        </div>
+      </div>
+      <h3 style="font-family:var(--font-head);font-size:1rem;font-weight:700;margin-bottom:.5rem">${titleH}</h3>
+      ${e.questionFile?`<a class="dl-btn" style="margin:.6rem 0;display:inline-flex" href="${e.questionFile}" download="${e.questionFileName}">📄 ${LANG==='fr'?'Télécharger l\'énoncé':'Download Question'} (PDF)</a>`:
+        `<p style="color:var(--muted);font-size:.84rem;line-height:1.65;white-space:pre-wrap">${qH}</p>`}
+      ${(e.solutionFile||e.solution)?`<button class="solve-btn" onclick="toggleSol(this,'${LANG}')">👁 ${solBtn}</button>
+      <div class="solution">${e.solutionFile?`<a class="dl-btn" href="${e.solutionFile}" download="${e.solutionFileName}">📄 ${LANG==='fr'?'Télécharger la correction':'Download Solution'} (PDF)</a>`:e.solution}</div>`:''}
+      <div style="font-size:.73rem;color:var(--muted);margin-top:.8rem">📅 ${e.date}</div>
+      ${admin?`<div class="admin-actions">
+        <button class="dbtn" onclick="confirmDel('ex',${e.id})">🗑 ${LANG==='fr'?'Supprimer':'Delete'}</button>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function toggleSol(btn, lang){
+  const s=btn.nextElementSibling;s.classList.toggle('show');
+  const isShow=s.classList.contains('show');
+  if(lang==='fr') btn.textContent=isShow?'🙈 Cacher':'👁 Voir la solution';
+  else btn.textContent=isShow?'🙈 Hide':'👁 View Solution';
+}
+
+function filter(cat,el){
+  cf=cat;
+  document.querySelectorAll('.cp').forEach(e=>e.classList.remove('on'));
+  el.classList.add('on');
+  renderPosts();renderEx();
+}
+
+function doSearch(val){
+  const btn=document.getElementById('search-clear');
+  if(btn) btn.classList.toggle('on', val.length>0);
+  renderPosts();renderEx();
+}
+
+function clearSearch(){
+  const inp=document.getElementById('search-inp');
+  if(inp){inp.value='';inp.focus();}
+  const btn=document.getElementById('search-clear');
+  if(btn) btn.classList.remove('on');
+  renderPosts();renderEx();
+}
+
+function applyFilters(){renderPosts();renderEx();}
+
+function resetFilters(){
+  const inp=document.getElementById('search-inp');if(inp)inp.value='';
+  const fl=document.getElementById('f-level');if(fl)fl.value='';
+  const ft=document.getElementById('f-type');if(ft)ft.value='';
+  const fd=document.getElementById('f-diff');if(fd)fd.value='';
+  const btn=document.getElementById('search-clear');if(btn)btn.classList.remove('on');
+  renderPosts();renderEx();
+}
+
+function showTab(tab){
+  document.getElementById('sec-cours').style.display=tab==='cours'?'':'none';
+  document.getElementById('sec-ex').style.display=tab==='exercices'?'':'none';
+  document.getElementById('sec-about').style.display=tab==='about'?'':'none';
+  const toolbarEl=document.getElementById('toolbar');
+  const catsEl=document.getElementById('cats-bar');
+  const rcEl=document.getElementById('result-count');
+  if(toolbarEl) toolbarEl.style.display=tab==='about'?'none':'';
+  if(catsEl) catsEl.style.display=tab==='about'?'none':'';
+  if(rcEl) rcEl.style.display=tab==='about'?'none':'';
+  // Show level+type filters for courses, diff filter for exercises
+  const fgType=document.getElementById('fg-type');
+  const fgDiff=document.getElementById('fg-diff');
+  const flevel=document.getElementById('f-level');
+  if(fgType) fgType.style.display=tab==='cours'?'':'none';
+  if(fgDiff) fgDiff.style.display=tab==='exercices'?'':'none';
+  if(flevel) flevel.parentElement.style.display=tab==='about'?'none':'';
+  // Reset diff when switching to courses, reset type when switching to ex
+  if(tab==='cours'){const fd=document.getElementById('f-diff');if(fd)fd.value='';}
+  if(tab==='exercices'){const ft=document.getElementById('f-type');if(ft)ft.value='';}
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('tab-'+tab).classList.add('on');
+  document.querySelectorAll('.nbtn').forEach(b=>b.classList.remove('on'));
+  const nbMap={cours:'nb-cours',exercices:'nb-ex',about:'nb-about'};
+  if(document.getElementById(nbMap[tab]))document.getElementById(nbMap[tab]).classList.add('on');
+  window.scrollTo({top:400,behavior:'smooth'});
+}
+function goHome(){
+  document.querySelectorAll('.nbtn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('nb-home').classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function adminClick(){
+  if(admin){
+    admin=false;
+    document.getElementById('nb-admin').innerHTML='🔐 <span class="admin-label">Admin</span>';
+    document.getElementById('nb-admin').classList.remove('admin-on');
+    document.getElementById('fab-wrap').style.display='none';
+    closeFab();renderPosts();renderEx();toast(T[LANG].loggedOut);return;
+  }
+  document.getElementById('lerr').style.display='none';
+  document.getElementById('pw').value='';open_('ol-login');
+  setTimeout(()=>document.getElementById('pw').focus(),300);
+}
+function doLogin(){
+  if(document.getElementById('pw').value===PASS){
+    admin=true;close_('ol-login');
+    document.getElementById('nb-admin').innerHTML='🟢 <span class="admin-label">Admin</span>';
+    document.getElementById('nb-admin').classList.add('admin-on');
+    document.getElementById('fab-wrap').style.display='flex';
+    renderPosts();renderEx();toast(T[LANG].loggedIn);
+  }else{document.getElementById('lerr').style.display='block';document.getElementById('pw').value='';}
+}
+
+function toggleFab(){fabOpen=!fabOpen;document.getElementById('fab-menu').classList.toggle('show',fabOpen);document.getElementById('fab').textContent=fabOpen?'✕':'＋';}
+function closeFab(){fabOpen=false;document.getElementById('fab-menu').classList.remove('show');document.getElementById('fab').textContent='＋';}
+
+function handleFile(file){if(file)readFile(file);}
+function handleDrop(e){e.preventDefault();document.getElementById('uz').classList.remove('drag');if(e.dataTransfer.files[0])readFile(e.dataTransfer.files[0]);}
+function readFile(file){
+  if(file.size>5*1024*1024){toast('⚠️ File too large (max 5 MB)',1);return;}
+  const ext=file.name.split('.').pop().toLowerCase();
+  if(!['pdf','doc','docx'].includes(ext)){toast('⚠️ PDF, DOC or DOCX only',1);return;}
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    curFile={name:file.name,type:ext==='pdf'?'pdf':'doc',data:ev.target.result,size:file.size};
+    const sz=file.size>1048576?(file.size/1048576).toFixed(1)+' MB':(file.size/1024).toFixed(0)+' KB';
+    document.getElementById('fp').style.display='flex';
+    document.getElementById('fp').className='fp';
+    document.getElementById('fp').innerHTML=`<span class="fp-ico">${ext==='pdf'?'📄':'📝'}</span>
+      <div class="fp-info"><div class="fp-name">${file.name}</div><div class="fp-sz">${sz}</div></div>
+      <button class="fp-del" onclick="clearFile()">✕</button>`;
+    document.getElementById('uz').style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+function clearFile(){curFile=null;document.getElementById('fp').style.display='none';document.getElementById('uz').style.display='';document.getElementById('fi').value='';}
+
+function handleFileEx(file,slot){if(file)readFileEx(file,slot);}
+function handleDropEx(e,slot){e.preventDefault();document.getElementById('uz-'+slot).classList.remove('drag');if(e.dataTransfer.files[0])readFileEx(e.dataTransfer.files[0],slot);}
+function readFileEx(file,slot){
+  if(file.size>5*1024*1024){toast('⚠️ File too large (max 5 MB)',1);return;}
+  if(file.name.split('.').pop().toLowerCase()!=='pdf'){toast('⚠️ PDF files only',1);return;}
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const obj={name:file.name,data:ev.target.result,size:file.size};
+    if(slot==='eq')curExQ=obj; else curExS=obj;
+    const sz=file.size>1048576?(file.size/1048576).toFixed(1)+' MB':(file.size/1024).toFixed(0)+' KB';
+    document.getElementById('fp-'+slot).style.display='flex';
+    document.getElementById('fp-'+slot).className='fp';
+    document.getElementById('fp-'+slot).innerHTML=`<span class="fp-ico">📄</span>
+      <div class="fp-info"><div class="fp-name">${file.name}</div><div class="fp-sz">${sz}</div></div>
+      <button class="fp-del" onclick="clearFileEx('${slot}')">✕</button>`;
+    document.getElementById('uz-'+slot).style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+function clearFileEx(slot){
+  if(slot==='eq')curExQ=null; else curExS=null;
+  document.getElementById('fp-'+slot).style.display='none';
+  document.getElementById('uz-'+slot).style.display='';
+  document.getElementById('fi-'+slot).value='';
+}
+function openForm(){closeFab();['ft','fs','fco','ftg'].forEach(id=>document.getElementById(id).value='');clearFile();open_('ol-form');}
+function openExForm(){closeFab();['ext','exq','exs','extg'].forEach(id=>document.getElementById(id).value='');clearFileEx('eq');clearFileEx('es');open_('ol-ex-form');}
+
+function submitPost(){
+  const t=document.getElementById('ft').value.trim();
+  const s=document.getElementById('fs').value.trim();
+  const c=document.getElementById('fco').value.trim();
+  if(!t||!s||(!c&&!curFile)){toast('⚠️ Title, summary, and content (text or file) required',1);return;}
+  const tags=document.getElementById('ftg').value.split(',').map(x=>x.trim()).filter(Boolean);
+  const d=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  posts.push({id:Date.now(),title:t,cat:document.getElementById('fc').value,
+    summary:s,content:c,tags,level:document.getElementById('fl').value,date:d,
+    fileType:curFile?curFile.type:null,fileName:curFile?curFile.name:null,fileData:curFile?curFile.data:null});
+  savePosts();close_('ol-form');toast(T[LANG].coursePublished);
+}
+
+function submitExercice(){
+  const t=document.getElementById('ext').value.trim();
+  const q=document.getElementById('exq').value.trim();
+  if(!t||((!q)&&(!curExQ))){toast('⚠️ Title and question (text or PDF) required',1);return;}
+  const tags=document.getElementById('extg').value.split(',').map(x=>x.trim()).filter(Boolean);
+  const d=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  exercices.push({id:Date.now(),title:t,cat:document.getElementById('exc').value,
+    diff:+document.getElementById('exd').value,
+    question:q,
+    questionFile:curExQ?curExQ.data:null,questionFileName:curExQ?curExQ.name:null,
+    solution:document.getElementById('exs').value.trim(),
+    solutionFile:curExS?curExS.data:null,solutionFileName:curExS?curExS.name:null,
+    tags,date:d});
+  saveEx();close_('ol-ex-form');toast(T[LANG].exercisePublished);
+}
+
+let pendingDel={type:null,id:null};
+function confirmDel(type,id){
+  pendingDel={type,id};
+  document.getElementById('confirm-del').onclick=()=>{
+    if(pendingDel.type==='post'){posts=posts.filter(p=>p.id!==pendingDel.id);savePosts();}
+    else{exercices=exercices.filter(e=>e.id!==pendingDel.id);saveEx();}
+    close_('ol-confirm');toast(T[LANG].deleted);
+  };
+  open_('ol-confirm');
+}
+
+function showDetail(id){
+  const p=posts.find(x=>x.id===id);if(!p)return;
+  const tags=p.tags.map(t=>`<span class="ptag">#${t}</span>`).join('');
+  const fileBtn=p.fileData?`<a class="dl-btn" href="${p.fileData}" download="${p.fileName}">
+    ${p.fileType==='pdf'?'📄':'📝'} Download ${p.fileName}</a>`:'' ;
+  document.getElementById('detail').innerHTML=`
+    <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:1rem">
+      <span style="font-size:1.8rem">${ICO[p.cat]}</span>
+      <div>
+        <span class="ctag ${CLS[p.cat]}">${LBL[p.cat]}</span>
+        ${p.fileType?`<span class="fbadge ${p.fileType==='pdf'?'fb-pdf':'fb-doc'}" style="margin-left:.4rem">${p.fileType==='pdf'?'📄 PDF':'📝 Word'}</span>`:''}
+        <div style="font-size:.75rem;color:var(--muted);margin-top:.3rem">📅 ${p.date} · ${p.level}</div>
+      </div>
+    </div>
+    <h2 style="font-family:var(--font-head);font-size:1.3rem;font-weight:800;margin-bottom:.6rem">${p.title}</h2>
+    <p style="color:var(--muted);margin-bottom:1rem;font-size:.9rem;line-height:1.65">${p.summary}</p>
+    ${fileBtn}
+    ${p.content?`<hr style="border-color:var(--border);margin:1rem 0"><div class="pbody">${p.content}</div>`:''}
+    ${tags?`<div class="ptags">${tags}</div>`:''}`;
+  open_('ol-detail');
+}
+
+function open_(id){document.getElementById(id).classList.add('open');}
+function close_(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+
+function toast(msg,warn=0){
+  const t=document.getElementById('toast');t.textContent=msg;
+  t.style.borderColor=warn?'var(--red)':'var(--green)';t.style.color=warn?'var(--red)':'var(--green)';
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+stats();renderPosts();renderEx();
+// Init: hide diff filter (shown only on exercises tab)
+(function(){
+  const fd=document.getElementById('fg-diff');if(fd)fd.style.display='none';
+  applyLangUI();
+})();
+</script>
+</body>
+</html>
