@@ -519,6 +519,88 @@ footer b{color:var(--accent);font-family:var(--font-head)}
 <div class="toast" id="toast"></div>
 
 <script>
+// ╔══════════════════════════════════════════════════╗
+// ║        GOOGLE SHEETS DATABASE BRIDGE             ║
+// ╚══════════════════════════════════════════════════╝
+
+const DB_URL = "https://script.google.com/macros/s/AKfycbz15QA-3HIerb84fNJgzNwqnoCuuW5m6erZsdcS_5bbxZXMl8ynVgw7b2lWzKgVXE0V/exec";
+// Example:
+// const DB_URL = "https://script.google.com/macros/s/AKfycbXXXX.../exec";
+
+const DB = {
+
+  async getAll(sheet) {
+    try {
+      const url = DB_URL + "?sheet=" + sheet + "&action=getAll";
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Network error: " + res.status);
+      return await res.json();
+    } catch (err) {
+      console.error("[DB.getAll] Failed:", err.message);
+      return [];
+    }
+  },
+
+  async getById(sheet, id) {
+    try {
+      const url = DB_URL + "?sheet=" + sheet + "&action=getById&id=" + id;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Network error: " + res.status);
+      return await res.json();
+    } catch (err) {
+      console.error("[DB.getById] Failed:", err.message);
+      return null;
+    }
+  },
+
+  async insert(sheet, data) {
+    try {
+      const res = await fetch(DB_URL, {
+        method: "POST",
+        body: JSON.stringify({ sheet: sheet, action: "insert", data: data })
+      });
+      if (!res.ok) throw new Error("Network error: " + res.status);
+      return await res.json();
+    } catch (err) {
+      console.error("[DB.insert] Failed:", err.message);
+      return { success: false, error: err.message };
+    }
+  },
+
+  async update(sheet, id, data) {
+    try {
+      const res = await fetch(DB_URL, {
+        method: "POST",
+        body: JSON.stringify({ sheet: sheet, action: "update", id: id, data: data })
+      });
+      if (!res.ok) throw new Error("Network error: " + res.status);
+      return await res.json();
+    } catch (err) {
+      console.error("[DB.update] Failed:", err.message);
+      return { success: false, error: err.message };
+    }
+  },
+
+  async delete(sheet, id) {
+    try {
+      const res = await fetch(DB_URL, {
+        method: "POST",
+        body: JSON.stringify({ sheet: sheet, action: "delete", id: id })
+      });
+      if (!res.ok) throw new Error("Network error: " + res.status);
+      return await res.json();
+    } catch (err) {
+      console.error("[DB.delete] Failed:", err.message);
+      return { success: false, error: err.message };
+    }
+  }
+
+};
+
+// ╔══════════════════════════════════════════════════╗
+// ║              END OF BRIDGE                       ║
+// ╚══════════════════════════════════════════════════╝
+
 // ── LANGUAGE ──
 let LANG = 'en';
 const T = {
@@ -662,40 +744,52 @@ const DIFF_LBL=['','Easy','Medium','Hard'];
 const DIFF_CLS=['','d1','d2','d3'];
 
 let admin=false,cf='all',fabOpen=false;
-let posts=JSON.parse(localStorage.getItem('em4')||'[]');
-let exercices=JSON.parse(localStorage.getItem('em4_ex')||'[]');
+let posts=[];
+let exercices=[];
 let curFile=null,curExQ=null,curExS=null;
 
-if(!posts.length){
-  posts=[
-    {id:1,title:'Introduction aux dérivées',cat:'math',summary:'Comprendre la dérivée, sa notation et ses premières applications.',
-     content:'Une dérivée mesure le taux de variation instantané d\'une fonction.\n\nExemple : Si f(x) = x², alors f\'(x) = 2x.\n\nRègles :\n• (xⁿ)\' = n·xⁿ⁻¹\n• (sin x)\' = cos x\n• (eˣ)\' = eˣ\n• (uv)\' = u\'v + uv\'\n\nApplications :\n→ Extrema : f\'(x) = 0\n→ Équation de la tangente',
-     tags:['dérivée','analyse','terminale'],level:'Intermediate',date:'15 Mar 2026',fileType:null,fileName:null,fileData:null},
-    {id:2,title:'Les lois de Newton',cat:'physics',summary:'Les trois lois fondamentales de la mécanique classique.',
-     content:'1ʳᵉ loi — Inertie :\nTout corps reste au repos ou en MRU sauf si une force agit.\n\n2ᵉ loi — Dynamique :\nΣF⃗ = m · a⃗\n\n3ᵉ loi — Réaction :\nToute action entraîne une réaction égale et opposée.',
-     tags:['Newton','mécanique','forces'],level:'Beginner',date:'14 Mar 2026',fileType:null,fileName:null,fileData:null},
-    {id:3,title:'Robot suiveur de ligne',cat:'robotics',summary:'Concevoir un robot autonome avec capteurs IR et Arduino.',
-     content:'Composants :\n• Arduino Uno\n• 2 moteurs DC + L298N\n• 2 capteurs IR\n• Châssis bois ou 3D\n\nLogique :\n→ IR gauche noir → tourner gauche\n→ IR droit noir → tourner droite\n→ Les deux blancs → avancer',
-     tags:['Arduino','capteur IR','autonome'],level:'Intermediate',date:'13 Mar 2026',fileType:null,fileName:null,fileData:null}
-  ];
-  savePosts();
+// ── GOOGLE SHEETS SAVE / LOAD ──────────────────────────
+async function savePosts(){
+  // posts array is already up to date in memory — just refresh UI
+  stats(); renderPosts();
 }
-if(!exercices.length){
-  exercices=[
-    {id:1,title:'Calcul d\'une dérivée',cat:'math',diff:1,
-     question:'Soit f(x) = 3x² + 2x - 5.\nCalcule f\'(x) et détermine les points où la tangente est horizontale.',
-     solution:'f\'(x) = 6x + 2\n\nTangente horizontale → f\'(x) = 0\n6x + 2 = 0  →  x = -1/3\n\nLa tangente est horizontale en x = -1/3.',
-     tags:['dérivée','polynôme'],date:'12 Mar 2026'},
-    {id:2,title:'2ᵉ loi de Newton — Application',cat:'physics',diff:2,
-     question:'Un objet de masse m = 4 kg est soumis à :\nF₁ = 10 N vers la droite\nF₂ = 6 N vers la gauche\n\nCalcule l\'accélération.',
-     solution:'ΣF = F₁ - F₂ = 10 - 6 = 4 N\n\nΣF = m·a  →  4 = 4·a  →  a = 1 m/s² (vers la droite)',
-     tags:['Newton','forces','accélération'],date:'11 Mar 2026'}
-  ];
-  saveEx();
+async function saveEx(){
+  stats(); renderEx();
 }
 
-function savePosts(){localStorage.setItem('em4',JSON.stringify(posts));stats();renderPosts();}
-function saveEx(){localStorage.setItem('em4_ex',JSON.stringify(exercices));stats();renderEx();}
+async function loadAllData(){
+  const dbStatus = document.getElementById('db-status');
+  if(dbStatus) dbStatus.textContent = '⏳ Loading data...';
+  try {
+    const [dbPosts, dbEx] = await Promise.all([
+      DB.getAll('posts'),
+      DB.getAll('exercices')
+    ]);
+
+    // Parse tags field (stored as comma-separated string in Sheets)
+    posts = dbPosts.map(p => ({
+      ...p,
+      id: Number(p.id) || p.id,
+      tags: typeof p.tags === 'string' ? p.tags.split(',').map(t=>t.trim()).filter(Boolean) : (p.tags||[]),
+      diff: p.diff !== undefined ? Number(p.diff) : undefined
+    }));
+
+    exercices = dbEx.map(e => ({
+      ...e,
+      id: Number(e.id) || e.id,
+      tags: typeof e.tags === 'string' ? e.tags.split(',').map(t=>t.trim()).filter(Boolean) : (e.tags||[]),
+      diff: Number(e.diff)||1
+    }));
+
+    if(dbStatus) dbStatus.textContent = '✅ Connected';
+    setTimeout(()=>{ if(dbStatus) dbStatus.style.display='none'; }, 3000);
+    console.log('✅ DB loaded — posts:', posts.length, '| exercises:', exercices.length);
+  } catch(err) {
+    if(dbStatus){ dbStatus.textContent='❌ DB error'; dbStatus.style.color='var(--red)'; }
+    console.error('DB load error:', err);
+  }
+  stats(); renderPosts(); renderEx();
+}
 function stats(){
   document.getElementById('s0').textContent=posts.filter(p=>p.cat==='math').length;
   document.getElementById('s1').textContent=posts.filter(p=>p.cat==='physics').length;
@@ -972,42 +1066,67 @@ function clearFileEx(slot){
 function openForm(){closeFab();['ft','fs','fco','ftg'].forEach(id=>document.getElementById(id).value='');clearFile();open_('ol-form');}
 function openExForm(){closeFab();['ext','exq','exs','extg'].forEach(id=>document.getElementById(id).value='');clearFileEx('eq');clearFileEx('es');open_('ol-ex-form');}
 
-function submitPost(){
+async function submitPost(){
   const t=document.getElementById('ft').value.trim();
   const s=document.getElementById('fs').value.trim();
   const c=document.getElementById('fco').value.trim();
   if(!t||!s||(!c&&!curFile)){toast('⚠️ Title, summary, and content (text or file) required',1);return;}
   const tags=document.getElementById('ftg').value.split(',').map(x=>x.trim()).filter(Boolean);
   const d=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-  posts.push({id:Date.now(),title:t,cat:document.getElementById('fc').value,
-    summary:s,content:c,tags,level:document.getElementById('fl').value,date:d,
-    fileType:curFile?curFile.type:null,fileName:curFile?curFile.name:null,fileData:curFile?curFile.data:null});
-  savePosts();close_('ol-form');toast(T[LANG].coursePublished);
+  const newPost={id:Date.now(),title:t,cat:document.getElementById('fc').value,
+    summary:s,content:c,tags:tags.join(','),level:document.getElementById('fl').value,date:d,
+    fileType:curFile?curFile.type:'',fileName:curFile?curFile.name:'',fileData:curFile?curFile.data:''};
+  toast('⏳ Saving...', 0);
+  const result = await DB.insert('posts', newPost);
+  if(result.success){
+    // also keep in local memory
+    newPost.tags = tags; newPost.id = result.id || newPost.id;
+    posts.push(newPost);
+    savePosts(); close_('ol-form'); toast(T[LANG].coursePublished);
+  } else {
+    toast('❌ Save failed: ' + (result.error||'unknown error'), 1);
+  }
 }
 
-function submitExercice(){
+async function submitExercice(){
   const t=document.getElementById('ext').value.trim();
   const q=document.getElementById('exq').value.trim();
   if(!t||((!q)&&(!curExQ))){toast('⚠️ Title and question (text or PDF) required',1);return;}
   const tags=document.getElementById('extg').value.split(',').map(x=>x.trim()).filter(Boolean);
   const d=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-  exercices.push({id:Date.now(),title:t,cat:document.getElementById('exc').value,
+  const newEx={id:Date.now(),title:t,cat:document.getElementById('exc').value,
     diff:+document.getElementById('exd').value,
     question:q,
-    questionFile:curExQ?curExQ.data:null,questionFileName:curExQ?curExQ.name:null,
+    questionFile:curExQ?curExQ.data:'',questionFileName:curExQ?curExQ.name:'',
     solution:document.getElementById('exs').value.trim(),
-    solutionFile:curExS?curExS.data:null,solutionFileName:curExS?curExS.name:null,
-    tags,date:d});
-  saveEx();close_('ol-ex-form');toast(T[LANG].exercisePublished);
+    solutionFile:curExS?curExS.data:'',solutionFileName:curExS?curExS.name:'',
+    tags:tags.join(','),date:d};
+  toast('⏳ Saving...', 0);
+  const result = await DB.insert('exercices', newEx);
+  if(result.success){
+    newEx.tags = tags; newEx.id = result.id || newEx.id;
+    exercices.push(newEx);
+    saveEx(); close_('ol-ex-form'); toast(T[LANG].exercisePublished);
+  } else {
+    toast('❌ Save failed: ' + (result.error||'unknown error'), 1);
+  }
 }
 
 let pendingDel={type:null,id:null};
 function confirmDel(type,id){
   pendingDel={type,id};
-  document.getElementById('confirm-del').onclick=()=>{
-    if(pendingDel.type==='post'){posts=posts.filter(p=>p.id!==pendingDel.id);savePosts();}
-    else{exercices=exercices.filter(e=>e.id!==pendingDel.id);saveEx();}
-    close_('ol-confirm');toast(T[LANG].deleted);
+  document.getElementById('confirm-del').onclick=async ()=>{
+    const sheet = pendingDel.type==='post' ? 'posts' : 'exercices';
+    toast('⏳ Deleting...', 0);
+    const result = await DB.delete(sheet, String(pendingDel.id));
+    if(result.success){
+      if(pendingDel.type==='post') posts=posts.filter(p=>p.id!==pendingDel.id);
+      else exercices=exercices.filter(e=>e.id!==pendingDel.id);
+      savePosts(); saveEx();
+      close_('ol-confirm'); toast(T[LANG].deleted);
+    } else {
+      toast('❌ Delete failed: '+(result.error||'unknown'), 1);
+    }
   };
   open_('ol-confirm');
 }
@@ -1044,11 +1163,25 @@ function toast(msg,warn=0){
   t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);
 }
 
+// ── DB STATUS INDICATOR ──
+document.addEventListener('DOMContentLoaded', function(){
+  const nav = document.querySelector('.nav-r');
+  if(nav){
+    const s = document.createElement('span');
+    s.id = 'db-status';
+    s.style.cssText = 'font-size:.72rem;color:var(--muted);padding:.3rem .7rem;background:var(--s2);border:1px solid var(--border);border-radius:8px;white-space:nowrap';
+    s.textContent = '⏳ Loading...';
+    nav.appendChild(s);
+  }
+});
+
 stats();renderPosts();renderEx();
 // Init: hide diff filter (shown only on exercises tab)
 (function(){
   const fd=document.getElementById('fg-diff');if(fd)fd.style.display='none';
   applyLangUI();
+  // Load all data from Google Sheets
+  loadAllData();
 })();
 </script>
 </body>
