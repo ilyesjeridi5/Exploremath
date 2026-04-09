@@ -523,7 +523,7 @@ footer b{color:var(--accent);font-family:var(--font-head)}
 // ║        GOOGLE SHEETS DATABASE BRIDGE             ║
 // ╚══════════════════════════════════════════════════╝
 
-const DB_URL = "https://script.google.com/macros/s/AKfycby5XygvvFk_jgXUitqhaCptHQZecE_0xfHNrCobU8xfExGL0C_J9rZWomUc3dX4sSsG/exec";
+const DB_URL = "https://script.google.com/macros/s/AKfycbzACA6D7VGZdR-rteJSYnXrI3nyBn-lummCu0HKaZDt_4X2F6Cc2XcXoHZjSpcAOlve/exec";
 // Example:
 // const DB_URL = "https://script.google.com/macros/s/AKfycbXXXX.../exec";
 
@@ -591,6 +591,28 @@ const DB = {
       return await res.json();
     } catch (err) {
       console.error("[DB.delete] Failed:", err.message);
+      return { success: false, error: err.message };
+    }
+  },
+
+  // Upload a file to Google Drive via Apps Script
+  async uploadFile(fileName, base64Data, fileType) {
+    try {
+      // Strip the data URL prefix (e.g. "data:application/pdf;base64,")
+      const base64 = base64Data.includes(',') ? base64Data.split(',')[1] : base64Data;
+      const res = await fetch(DB_URL, {
+        method: "POST",
+        body: JSON.stringify({
+          action: "uploadFile",
+          fileName: fileName,
+          base64: base64,
+          fileType: fileType
+        })
+      });
+      if (!res.ok) throw new Error("Network error: " + res.status);
+      return await res.json();
+    } catch (err) {
+      console.error("[DB.uploadFile] Failed:", err.message);
       return { success: false, error: err.message };
     }
   }
@@ -748,47 +770,34 @@ let posts=[];
 let exercices=[];
 let curFile=null,curExQ=null,curExS=null;
 
-// ── GOOGLE SHEETS SAVE / LOAD ──────────────────────────
-async function savePosts(){
-  // posts array is already up to date in memory — just refresh UI
-  stats(); renderPosts();
-}
-async function saveEx(){
-  stats(); renderEx();
-}
+function savePosts(){stats();renderPosts();}
+function saveEx(){stats();renderEx();}
 
 async function loadAllData(){
-  const dbStatus = document.getElementById('db-status');
-  if(dbStatus) dbStatus.textContent = '⏳ Loading data...';
-  try {
-    const [dbPosts, dbEx] = await Promise.all([
-      DB.getAll('posts'),
-      DB.getAll('exercices')
-    ]);
-
-    // Parse tags field (stored as comma-separated string in Sheets)
-    posts = dbPosts.map(p => ({
+  const dbStatus=document.getElementById('db-status');
+  if(dbStatus) dbStatus.textContent='⏳ Loading...';
+  try{
+    const [dbPosts,dbEx]=await Promise.all([DB.getAll('posts'),DB.getAll('exercices')]);
+    posts=dbPosts.map(p=>({
       ...p,
-      id: Number(p.id) || p.id,
-      tags: typeof p.tags === 'string' ? p.tags.split(',').map(t=>t.trim()).filter(Boolean) : (p.tags||[]),
-      diff: p.diff !== undefined ? Number(p.diff) : undefined
+      id:p.id,
+      tags:typeof p.tags==='string'?p.tags.split(',').map(t=>t.trim()).filter(Boolean):(p.tags||[]),
+      fileUrl:p.fileUrl||'',
+      fileData:p.fileUrl||''
     }));
-
-    exercices = dbEx.map(e => ({
+    exercices=dbEx.map(e=>({
       ...e,
-      id: Number(e.id) || e.id,
-      tags: typeof e.tags === 'string' ? e.tags.split(',').map(t=>t.trim()).filter(Boolean) : (e.tags||[]),
-      diff: Number(e.diff)||1
+      id:e.id,
+      tags:typeof e.tags==='string'?e.tags.split(',').map(t=>t.trim()).filter(Boolean):(e.tags||[]),
+      diff:Number(e.diff)||1
     }));
-
-    if(dbStatus) dbStatus.textContent = '✅ Connected';
-    setTimeout(()=>{ if(dbStatus) dbStatus.style.display='none'; }, 3000);
-    console.log('✅ DB loaded — posts:', posts.length, '| exercises:', exercices.length);
-  } catch(err) {
-    if(dbStatus){ dbStatus.textContent='❌ DB error'; dbStatus.style.color='var(--red)'; }
-    console.error('DB load error:', err);
+    if(dbStatus){dbStatus.textContent='✅ Connected';setTimeout(()=>{dbStatus.style.display='none';},3000);}
+    console.log('✅ DB loaded — posts:',posts.length,'| exercises:',exercices.length);
+  }catch(err){
+    if(dbStatus){dbStatus.textContent='❌ DB error';dbStatus.style.color='var(--red)';}
+    console.error('DB load error:',err);
   }
-  stats(); renderPosts(); renderEx();
+  stats();renderPosts();renderEx();
 }
 function stats(){
   document.getElementById('s0').textContent=posts.filter(p=>p.cat==='math').length;
@@ -908,10 +917,10 @@ function renderEx(){
         </div>
       </div>
       <h3 style="font-family:var(--font-head);font-size:1rem;font-weight:700;margin-bottom:.5rem">${titleH}</h3>
-      ${e.questionFile?`<a class="dl-btn" style="margin:.6rem 0;display:inline-flex" href="${e.questionFile}" download="${e.questionFileName}">📄 ${LANG==='fr'?'Télécharger l\'énoncé':'Download Question'} (PDF)</a>`:
+      ${e.questionFile?`<a class="dl-btn" style="margin:.6rem 0;display:inline-flex" href="${e.questionFile}" target="_blank" rel="noopener">📄 ${LANG==='fr'?'Télécharger l\'énoncé':'Download Question'} (PDF)</a>`:
         `<p style="color:var(--muted);font-size:.84rem;line-height:1.65;white-space:pre-wrap">${qH}</p>`}
       ${(e.solutionFile||e.solution)?`<button class="solve-btn" onclick="toggleSol(this,'${LANG}')">👁 ${solBtn}</button>
-      <div class="solution">${e.solutionFile?`<a class="dl-btn" href="${e.solutionFile}" download="${e.solutionFileName}">📄 ${LANG==='fr'?'Télécharger la correction':'Download Solution'} (PDF)</a>`:e.solution}</div>`:''}
+      <div class="solution">${e.solutionFile?`<a class="dl-btn" href="${e.solutionFile}" target="_blank" rel="noopener">📄 ${LANG==='fr'?'Télécharger la correction':'Download Solution'} (PDF)</a>`:e.solution}</div>`:''}
       <div style="font-size:.73rem;color:var(--muted);margin-top:.8rem">📅 ${e.date}</div>
       ${admin?`<div class="admin-actions">
         <button class="dbtn" onclick="confirmDel('ex',${e.id})">🗑 ${LANG==='fr'?'Supprimer':'Delete'}</button>
@@ -1073,18 +1082,29 @@ async function submitPost(){
   if(!t||!s||(!c&&!curFile)){toast('⚠️ Title, summary, and content (text or file) required',1);return;}
   const tags=document.getElementById('ftg').value.split(',').map(x=>x.trim()).filter(Boolean);
   const d=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-  const newPost={id:Date.now(),title:t,cat:document.getElementById('fc').value,
-    summary:s,content:c,tags:tags.join(','),level:document.getElementById('fl').value,date:d,
-    fileType:curFile?curFile.type:'',fileName:curFile?curFile.name:'',fileData:curFile?curFile.data:''};
-  toast('⏳ Saving...', 0);
+  const id=Date.now();
+
+  let fileUrl='', fileName='', fileType='';
+  if(curFile){
+    toast('⏳ Uploading file to Drive...', 0);
+    const uploadResult = await DB.uploadFile(curFile.name, curFile.data, curFile.type);
+    if(!uploadResult.success){ toast('❌ File upload failed: '+(uploadResult.error||'unknown'),1); return; }
+    fileUrl = uploadResult.url;
+    fileName = curFile.name;
+    fileType = curFile.type;
+  }
+
+  toast('⏳ Saving course...', 0);
+  const newPost={id, title:t, cat:document.getElementById('fc').value,
+    summary:s, content:c, tags:tags.join(','), level:document.getElementById('fl').value, date:d,
+    fileType, fileName, fileUrl};
   const result = await DB.insert('posts', newPost);
   if(result.success){
-    // also keep in local memory
-    newPost.tags = tags; newPost.id = result.id || newPost.id;
+    newPost.tags=tags; newPost.fileData=fileUrl;
     posts.push(newPost);
-    savePosts(); close_('ol-form'); toast(T[LANG].coursePublished);
+    stats();renderPosts();close_('ol-form');toast(T[LANG].coursePublished);
   } else {
-    toast('❌ Save failed: ' + (result.error||'unknown error'), 1);
+    toast('❌ Save failed: '+(result.error||'unknown'),1);
   }
 }
 
@@ -1094,21 +1114,39 @@ async function submitExercice(){
   if(!t||((!q)&&(!curExQ))){toast('⚠️ Title and question (text or PDF) required',1);return;}
   const tags=document.getElementById('extg').value.split(',').map(x=>x.trim()).filter(Boolean);
   const d=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-  const newEx={id:Date.now(),title:t,cat:document.getElementById('exc').value,
+  const id=Date.now();
+
+  let questionFileUrl='', questionFileName='';
+  let solutionFileUrl='', solutionFileName='';
+
+  if(curExQ){
+    toast('⏳ Uploading question PDF...', 0);
+    const r = await DB.uploadFile(curExQ.name, curExQ.data, 'pdf');
+    if(!r.success){ toast('❌ Question upload failed: '+(r.error||'unknown'),1); return; }
+    questionFileUrl=r.url; questionFileName=curExQ.name;
+  }
+  if(curExS){
+    toast('⏳ Uploading solution PDF...', 0);
+    const r = await DB.uploadFile(curExS.name, curExS.data, 'pdf');
+    if(!r.success){ toast('❌ Solution upload failed: '+(r.error||'unknown'),1); return; }
+    solutionFileUrl=r.url; solutionFileName=curExS.name;
+  }
+
+  toast('⏳ Saving exercise...', 0);
+  const newEx={id, title:t, cat:document.getElementById('exc').value,
     diff:+document.getElementById('exd').value,
     question:q,
-    questionFile:curExQ?curExQ.data:'',questionFileName:curExQ?curExQ.name:'',
+    questionFile:questionFileUrl, questionFileName,
     solution:document.getElementById('exs').value.trim(),
-    solutionFile:curExS?curExS.data:'',solutionFileName:curExS?curExS.name:'',
-    tags:tags.join(','),date:d};
-  toast('⏳ Saving...', 0);
+    solutionFile:solutionFileUrl, solutionFileName,
+    tags:tags.join(','), date:d};
   const result = await DB.insert('exercices', newEx);
   if(result.success){
-    newEx.tags = tags; newEx.id = result.id || newEx.id;
+    newEx.tags=tags;
     exercices.push(newEx);
-    saveEx(); close_('ol-ex-form'); toast(T[LANG].exercisePublished);
+    stats();renderEx();close_('ol-ex-form');toast(T[LANG].exercisePublished);
   } else {
-    toast('❌ Save failed: ' + (result.error||'unknown error'), 1);
+    toast('❌ Save failed: '+(result.error||'unknown'),1);
   }
 }
 
@@ -1116,26 +1154,27 @@ let pendingDel={type:null,id:null};
 function confirmDel(type,id){
   pendingDel={type,id};
   document.getElementById('confirm-del').onclick=async ()=>{
-    const sheet = pendingDel.type==='post' ? 'posts' : 'exercices';
+    const sheet=pendingDel.type==='post'?'posts':'exercices';
     toast('⏳ Deleting...', 0);
     const result = await DB.delete(sheet, String(pendingDel.id));
     if(result.success){
-      if(pendingDel.type==='post') posts=posts.filter(p=>p.id!==pendingDel.id);
-      else exercices=exercices.filter(e=>e.id!==pendingDel.id);
-      savePosts(); saveEx();
-      close_('ol-confirm'); toast(T[LANG].deleted);
+      if(pendingDel.type==='post') posts=posts.filter(p=>String(p.id)!==String(pendingDel.id));
+      else exercices=exercices.filter(e=>String(e.id)!==String(pendingDel.id));
+      stats();renderPosts();renderEx();
+      close_('ol-confirm');toast(T[LANG].deleted);
     } else {
-      toast('❌ Delete failed: '+(result.error||'unknown'), 1);
+      toast('❌ Delete failed: '+(result.error||'unknown'),1);
     }
   };
   open_('ol-confirm');
 }
 
 function showDetail(id){
-  const p=posts.find(x=>x.id===id);if(!p)return;
-  const tags=p.tags.map(t=>`<span class="ptag">#${t}</span>`).join('');
-  const fileBtn=p.fileData?`<a class="dl-btn" href="${p.fileData}" download="${p.fileName}">
-    ${p.fileType==='pdf'?'📄':'📝'} Download ${p.fileName}</a>`:'' ;
+  const p=posts.find(x=>String(x.id)===String(id));if(!p)return;
+  const tags=(Array.isArray(p.tags)?p.tags:[]).map(t=>`<span class="ptag">#${t}</span>`).join('');
+  const driveUrl=p.fileUrl||p.fileData||'';
+  const fileBtn=driveUrl?`<a class="dl-btn" href="${driveUrl}" target="_blank" rel="noopener">
+    ${p.fileType==='pdf'?'📄':'📝'} Open ${p.fileName||'file'}</a>`:'';
   document.getElementById('detail').innerHTML=`
     <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:1rem">
       <span style="font-size:1.8rem">${ICO[p.cat]}</span>
@@ -1163,24 +1202,20 @@ function toast(msg,warn=0){
   t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);
 }
 
-// ── DB STATUS INDICATOR ──
-document.addEventListener('DOMContentLoaded', function(){
-  const nav = document.querySelector('.nav-r');
-  if(nav){
-    const s = document.createElement('span');
-    s.id = 'db-status';
-    s.style.cssText = 'font-size:.72rem;color:var(--muted);padding:.3rem .7rem;background:var(--s2);border:1px solid var(--border);border-radius:8px;white-space:nowrap';
-    s.textContent = '⏳ Loading...';
-    nav.appendChild(s);
-  }
-});
-
 stats();renderPosts();renderEx();
-// Init: hide diff filter (shown only on exercises tab)
+// Init
 (function(){
   const fd=document.getElementById('fg-diff');if(fd)fd.style.display='none';
   applyLangUI();
-  // Load all data from Google Sheets
+  // Add DB status badge to nav
+  const nav=document.querySelector('.nav-r');
+  if(nav){
+    const s=document.createElement('span');
+    s.id='db-status';
+    s.style.cssText='font-size:.72rem;color:var(--muted);padding:.3rem .7rem;background:var(--s2);border:1px solid var(--border);border-radius:8px;white-space:nowrap;flex-shrink:0';
+    s.textContent='⏳ Loading...';
+    nav.appendChild(s);
+  }
   loadAllData();
 })();
 </script>
