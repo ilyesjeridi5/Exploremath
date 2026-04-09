@@ -522,16 +522,7 @@ footer b{color:var(--accent);font-family:var(--font-head)}
 // ╔══════════════════════════════════════════════════╗
 // ║        GOOGLE SHEETS DATABASE BRIDGE             ║
 // ╚══════════════════════════════════════════════════╝
-// Logs the name of every file in the user's Drive.
-const files = DriveApp.getFiles();
-while (files.hasNext()) {
-  const file = files.next();
-  console.log(file.getName());
-}
-// Creates a folder that anyone on the Internet can read from and write to.
-// (Domain administrators can prohibit this setting for Google Workspace users.)
-const folder = DriveApp.createFolder('Shared Folder');
-folder.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT);
+
 const DB_URL = "https://script.google.com/macros/s/AKfycbwGW8eAn4dtnbhy9SlI1GCNRHZDCwULGgzl_FYE3-7gR9UISypWx0CNQEFyKmKXGw-D/exec";
 // Example:
 // const DB_URL = "https://script.google.com/macros/s/AKfycbXXXX.../exec";
