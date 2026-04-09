@@ -782,14 +782,24 @@ async function loadAllData(){
     ]);
     posts = dbPosts.map(p => ({
       ...p,
-      id: String(p.id),
+      id: String(p.id).trim(),
+      title: String(p.title||''),
+      summary: String(p.summary||''),
+      content: String(p.content||''),
       tags: typeof p.tags==='string' ? p.tags.split(',').map(t=>t.trim()).filter(Boolean) : (p.tags||[]),
-      fileUrl: p.fileUrl||'',
-      fileData: p.fileUrl||''
+      fileUrl: String(p.fileUrl||''),
+      fileData: String(p.fileUrl||'')
     }));
     exercices = dbEx.map(e => ({
       ...e,
-      id: String(e.id),
+      id: String(e.id).trim(),
+      title: String(e.title||''),
+      question: String(e.question||''),
+      solution: String(e.solution||''),
+      questionFile: String(e.questionFile||''),
+      questionFileName: String(e.questionFileName||''),
+      solutionFile: String(e.solutionFile||''),
+      solutionFileName: String(e.solutionFileName||''),
       tags: typeof e.tags==='string' ? e.tags.split(',').map(t=>t.trim()).filter(Boolean) : (e.tags||[]),
       diff: Number(e.diff)||1
     }));
@@ -919,10 +929,10 @@ function renderEx(){
         </div>
       </div>
       <h3 style="font-family:var(--font-head);font-size:1rem;font-weight:700;margin-bottom:.5rem">${titleH}</h3>
-      ${e.questionFile?`<a class="dl-btn" style="margin:.6rem 0;display:inline-flex" href="${e.questionFile}" download="${e.questionFileName}">📄 ${LANG==='fr'?'Télécharger l\'énoncé':'Download Question'} (PDF)</a>`:
+      ${e.questionFile?`<a class="dl-btn" style="margin:.6rem 0;display:inline-flex" href="${e.questionFile}" target="_blank" rel="noopener">📄 ${LANG==='fr'?'Ouvrir l\'énoncé':'Open Question'} (PDF)</a>`:
         `<p style="color:var(--muted);font-size:.84rem;line-height:1.65;white-space:pre-wrap">${qH}</p>`}
       ${(e.solutionFile||e.solution)?`<button class="solve-btn" onclick="toggleSol(this,'${LANG}')">👁 ${solBtn}</button>
-      <div class="solution">${e.solutionFile?`<a class="dl-btn" href="${e.solutionFile}" download="${e.solutionFileName}">📄 ${LANG==='fr'?'Télécharger la correction':'Download Solution'} (PDF)</a>`:e.solution}</div>`:''}
+      <div class="solution">${e.solutionFile?`<a class="dl-btn" href="${e.solutionFile}" target="_blank" rel="noopener">📄 ${LANG==='fr'?'Ouvrir la correction':'Open Solution'} (PDF)</a>`:e.solution}</div>`:''}
       <div style="font-size:.73rem;color:var(--muted);margin-top:.8rem">📅 ${e.date}</div>
       ${admin?`<div class="admin-actions">
         <button class="dbtn" onclick="confirmDel('ex','${e.id}')">🗑 ${LANG==='fr'?'Supprimer':'Delete'}</button>
@@ -1095,12 +1105,13 @@ async function submitPost(){
   }
 
   toast('⏳ Saving course...', 0);
-  const newPost={id, title:t, cat:document.getElementById('fc').value,
+  const safeId='p_'+id;
+  const newPost={id:safeId, title:t, cat:document.getElementById('fc').value,
     summary:s, content:c, tags:tags.join(','), level:document.getElementById('fl').value,
     date:d, fileType, fileName, fileUrl};
   const result = await DB.insert('posts', newPost);
   if(result.success){
-    newPost.tags=tags; newPost.id=String(id);
+    newPost.tags=tags;
     posts.push(newPost);
     savePosts(); close_('ol-form'); toast(T[LANG].coursePublished);
   } else {
@@ -1133,7 +1144,8 @@ async function submitExercice(){
   }
 
   toast('⏳ Saving exercise...', 0);
-  const newEx={id, title:t, cat:document.getElementById('exc').value,
+  const safeId='e_'+id;
+  const newEx={id:safeId, title:t, cat:document.getElementById('exc').value,
     diff:+document.getElementById('exd').value,
     question:q, questionFile, questionFileName,
     solution:document.getElementById('exs').value.trim(),
@@ -1141,7 +1153,7 @@ async function submitExercice(){
     tags:tags.join(','), date:d};
   const result = await DB.insert('exercices', newEx);
   if(result.success){
-    newEx.tags=tags; newEx.id=String(id);
+    newEx.tags=tags;
     exercices.push(newEx);
     saveEx(); close_('ol-ex-form'); toast(T[LANG].exercisePublished);
   } else {
