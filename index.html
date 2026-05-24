@@ -1239,5 +1239,98 @@ stats();renderPosts();renderEx();
   loadAllData();
 })();
 </script>
+  // ╔══════════════════════════════════════════════════╗
+// ║         AI SOLVER UI HANDLER                     ║
+// ╚══════════════════════════════════════════════════╝
+
+function openAISolver() {
+  const modal = document.getElementById('ol-ai-solver');
+  if (modal) {
+    modal.classList.add('open');
+  } else {
+    showToast('⚠️ AI Solver modal not found');
+  }
+}
+
+async function solveMath() {
+  const problemInput = document.getElementById('ai-problem-inp');
+  const problemText = problemInput?.value?.trim();
+  
+  if (!problemText) {
+    showToast('⚠️ Please enter a math problem');
+    return;
+  }
+  
+  const solveBtn = document.getElementById('ai-solve-btn');
+  const resultDiv = document.getElementById('ai-result');
+  
+  solveBtn.disabled = true;
+  solveBtn.textContent = '⏳ Solving...';
+  resultDiv.innerHTML = '';
+  
+  try {
+    const token = localStorage.getItem('gh_models_token');
+    if (!token) {
+      showToast('⚠️ GitHub token not set. Please configure it in settings.');
+      return;
+    }
+    
+    const result = await MATH_AI.solveProblem(problemText);
+    resultDiv.innerHTML = `
+      <div style="background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:1.2rem;margin-top:1rem">
+        <div style="font-size:.8rem;color:var(--muted);margin-bottom:.8rem">
+          ✅ Solved by ${result.model} • ${new Date(result.timestamp).toLocaleTimeString()}
+        </div>
+        <div style="line-height:1.7;color:var(--text)">${result.solution.replace(/\n/g, '<br>')}</div>
+      </div>
+    `;
+    showToast('✅ Solution ready!');
+  } catch (error) {
+    resultDiv.innerHTML = `<div style="color:var(--red);padding:1rem;background:rgba(255,94,109,.1);border-radius:8px">❌ ${error.message}</div>`;
+    showToast('❌ Error solving problem');
+  } finally {
+    solveBtn.disabled = false;
+    solveBtn.textContent = '🚀 Solve';
+  }
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  if (toast) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+}
+  <!-- AI SOLVER MODAL -->
+<div class="overlay" id="ol-ai-solver">
+  <div class="modal wide">
+    <button class="xbtn" onclick="close_('ol-ai-solver')">✕</button>
+    <h2>🤖 AI Math Solver</h2>
+    <p class="msub">Powered by GitHub Models (GPT-4o)</p>
+    
+    <div class="fg">
+      <label>Enter your math problem *</label>
+      <textarea id="ai-problem-inp" placeholder="Example: Find the derivative of f(x) = 3x² + 2x + 1" style="min-height:120px"></textarea>
+    </div>
+    
+    <div style="display:flex;gap:.8rem;margin-bottom:1.5rem">
+      <button class="sub-btn" id="ai-solve-btn" onclick="solveMath()" style="flex:1">🚀 Solve</button>
+      <button class="bo" onclick="document.getElementById('ai-problem-inp').value='';document.getElementById('ai-result').innerHTML=''" style="padding:.85rem 2rem">Clear</button>
+    </div>
+    
+    <div id="ai-result"></div>
+    
+    <div style="margin-top:1.5rem;padding:1rem;background:var(--s2);border:1px solid var(--border);border-radius:8px;font-size:.82rem;color:var(--muted)">
+      <strong>⚙️ Setup Required:</strong><br>
+      You need to set your GitHub Models API token. Open browser console and run:<br>
+      <code style="background:var(--s3);padding:.3rem .5rem;border-radius:4px;color:var(--accent)">localStorage.setItem('gh_models_token', 'your_github_token')</code>
+    </div>
+  </div>
+</div>
+  function close_(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('open');
+}
 </body>
 </html>
