@@ -1,0 +1,217 @@
+<!-- 🤖 AI MATH SOLVER MODAL -->
+<div class="overlay" id="ol-ai-solver">
+  <div class="modal wide">
+    <button class="xbtn" onclick="closeAISolver()">✕</button>
+    <div style="margin-bottom: 1.5rem;">
+      <h2 style="margin-bottom: 0.5rem;">🤖 AI Math Solver</h2>
+      <p class="msub">Powered by GitHub Models • ExploreMath by Ilyes Jeridi</p>
+    </div>
+    
+    <!-- Token Setup Section -->
+    <div id="ai-token-setup" style="display: none; margin-bottom: 1.5rem; padding: 1rem; background: var(--s2); border-radius: 12px; border: 1px solid var(--border);">
+      <h3 style="font-size: 0.9rem; font-weight: 700; margin-bottom: 0.8rem; color: var(--a2);">⚙️ Setup Required</h3>
+      <p style="font-size: 0.85rem; color: var(--muted); line-height: 1.6; margin-bottom: 1rem;">
+        To use the AI solver, you need a GitHub token with Models access:
+      </p>
+      <ol style="font-size: 0.8rem; color: var(--muted); line-height: 1.8; margin-left: 1.2rem; margin-bottom: 1rem;">
+        <li>Go to <a href="https://github.com/settings/tokens" target="_blank" style="color: var(--accent);">github.com/settings/tokens</a></li>
+        <li>Create a new token with <strong>Models</strong> scope</li>
+        <li>Copy the token (starts with <code style="background: var(--s3); padding: 0.2rem 0.4rem; border-radius: 4px;">ghp_</code>)</li>
+      </ol>
+      <div class="fg">
+        <label>GitHub Token</label>
+        <input type="password" id="ai-token-input" placeholder="ghp_..." style="font-family: monospace;">
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.8rem;">
+          <button class="sub-btn" style="width: auto; padding: 0.6rem 1.2rem;" onclick="saveAIToken()">✅ Save Token</button>
+          <button class="bo" style="padding: 0.6rem 1.2rem;" onclick="testAIConnection()">🔗 Test Connection</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Solver Section -->
+    <div id="ai-solver-main">
+      <div class="fg">
+        <label>📐 Enter Your Math Problem</label>
+        <textarea 
+          id="ai-problem-input" 
+          placeholder="Example: Find the derivative of f(x) = 3x² + 2x - 5
+
+Or: Solve the equation: 2x + 5 = 15
+
+Or: Calculate the area of a circle with radius 7 cm"
+          style="min-height: 120px; font-family: 'DM Sans', sans-serif;"></textarea>
+      </div>
+      
+      <!-- Loading State -->
+      <div id="ai-loading" style="display: none; text-align: center; padding: 2rem;">
+        <div style="font-size: 2rem; margin-bottom: 0.8rem; animation: spin 1s linear infinite;">⏳</div>
+        <p style="color: var(--muted); font-size: 0.9rem;">Solving your problem with AI...</p>
+      </div>
+      
+      <!-- Solution Display -->
+      <div id="ai-solution-box" style="display: none; margin-top: 1.5rem;">
+        <div style="padding: 1.2rem; background: var(--s2); border: 1px solid var(--border); border-radius: 12px;">
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+            <span style="font-size: 1.1rem;">✨</span>
+            <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--green);">Solution Generated</span>
+          </div>
+          <div id="ai-solution-content" style="font-size: 0.9rem; line-height: 1.8; color: var(--text); white-space: pre-wrap; word-break: break-word;"></div>
+          <div style="display: flex; gap: 0.6rem; margin-top: 1rem;">
+            <button class="dl-btn" onclick="copyAISolution()" style="display: inline-flex;">📋 Copy Solution</button>
+            <button class="dl-btn" onclick="clearAISolver()" style="display: inline-flex;">🔄 New Problem</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Error Display -->
+      <div id="ai-error-box" style="display: none; margin-top: 1rem; padding: 1rem; background: rgba(255, 94, 109, 0.1); border: 1px solid rgba(255, 94, 109, 0.3); border-radius: 10px;">
+        <p style="color: var(--red); font-size: 0.9rem;" id="ai-error-text"></p>
+      </div>
+      
+      <!-- Solve Button -->
+      <button id="ai-solve-btn" class="sub-btn" style="margin-top: 1.2rem;" onclick="solveWithAI()">🚀 Solve with AI</button>
+    </div>
+    
+    <!-- Footer Info -->
+    <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+      <p style="font-size: 0.75rem; color: var(--muted); text-align: center;">
+        <strong>ExploreMath AI Solver</strong> • Created by Ilyes Jeridi • Powered by GitHub Models (GPT-4o)
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- CSS for spinner animation -->
+<style>
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+</style>
+
+<script>
+// AI Solver Functions
+function openAISolver() {
+  const modal = document.getElementById('ol-ai-solver');
+  modal.classList.add('open');
+  checkAITokenStatus();
+}
+
+function closeAISolver() {
+  const modal = document.getElementById('ol-ai-solver');
+  modal.classList.remove('open');
+  clearAISolver();
+}
+
+function checkAITokenStatus() {
+  const token = MATH_AI.getToken();
+  const tokenSetup = document.getElementById('ai-token-setup');
+  const solverMain = document.getElementById('ai-solver-main');
+  
+  if (!token) {
+    tokenSetup.style.display = 'block';
+    solverMain.style.display = 'none';
+  } else {
+    tokenSetup.style.display = 'none';
+    solverMain.style.display = 'block';
+  }
+}
+
+function saveAIToken() {
+  const input = document.getElementById('ai-token-input');
+  const token = input.value.trim();
+  
+  if (!token) {
+    showAIError('Please enter your GitHub token');
+    return;
+  }
+  
+  if (!token.startsWith('ghp_')) {
+    showAIError('Invalid token format. Should start with ghp_');
+    return;
+  }
+  
+  MATH_AI.setToken(token);
+  input.value = '';
+  showAIError('✅ Token saved! You can now solve problems.');
+  setTimeout(() => checkAITokenStatus(), 1000);
+}
+
+function testAIConnection() {
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = '🔄 Testing...';
+  
+  MATH_AI.verifyToken().then(valid => {
+    if (valid) {
+      showAIError('✅ Connection successful! Token is valid.');
+    } else {
+      showAIError('❌ Connection failed. Check your token.');
+    }
+    btn.disabled = false;
+    btn.textContent = '🔗 Test Connection';
+  });
+}
+
+async function solveWithAI() {
+  const problemInput = document.getElementById('ai-problem-input');
+  const problem = problemInput.value.trim();
+  
+  if (!problem) {
+    showAIError('Please enter a math problem to solve');
+    return;
+  }
+  
+  // Show loading
+  document.getElementById('ai-loading').style.display = 'block';
+  document.getElementById('ai-solution-box').style.display = 'none';
+  document.getElementById('ai-error-box').style.display = 'none';
+  document.getElementById('ai-solve-btn').disabled = true;
+  
+  try {
+    const result = await MATH_AI.solveProblem(problem);
+    
+    // Hide loading
+    document.getElementById('ai-loading').style.display = 'none';
+    
+    // Display solution
+    document.getElementById('ai-solution-content').textContent = result.solution;
+    document.getElementById('ai-solution-box').style.display = 'block';
+    
+  } catch (error) {
+    document.getElementById('ai-loading').style.display = 'none';
+    showAIError(error.message);
+  } finally {
+    document.getElementById('ai-solve-btn').disabled = false;
+  }
+}
+
+function copyAISolution() {
+  const content = document.getElementById('ai-solution-content').textContent;
+  navigator.clipboard.writeText(content).then(() => {
+    showToast('✅ Solution copied to clipboard!');
+  });
+}
+
+function clearAISolver() {
+  document.getElementById('ai-problem-input').value = '';
+  document.getElementById('ai-solution-box').style.display = 'none';
+  document.getElementById('ai-error-box').style.display = 'none';
+  document.getElementById('ai-loading').style.display = 'none';
+}
+
+function showAIError(message) {
+  const errorBox = document.getElementById('ai-error-box');
+  const errorText = document.getElementById('ai-error-text');
+  errorText.textContent = message;
+  errorBox.style.display = 'block';
+}
+
+// Make functions global
+window.openAISolver = openAISolver;
+window.closeAISolver = closeAISolver;
+window.solveWithAI = solveWithAI;
+window.copyAISolution = copyAISolution;
+window.clearAISolver = clearAISolver;
+window.saveAIToken = saveAIToken;
+window.testAIConnection = testAIConnection;
+</script>
