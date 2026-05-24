@@ -233,6 +233,9 @@ footer b{color:var(--accent);font-family:var(--font-head)}
       <button class="nbtn on" id="nb-home" onclick="goHome()">🏠 <span>Home</span></button>
       <button class="nbtn" id="nb-cours" onclick="showTab('cours')">📚 <span>Courses</span></button>
       <button class="nbtn" id="nb-ex" onclick="showTab('exercices')">✏️ <span>Exercises</span></button>
+      <button class="nbtn" id="nb-ex" onclick="showTab('exercices')">✏️ <span>Exercises</span></button>
+      <button class="nbtn" onclick="openAISolver()">🤖 <span>AI Solver</span></button>
+      <button class="nbtn" id="nb-about" onclick="showTab('about')">👤 <span>About</span></button>
       <button class="nbtn" id="nb-about" onclick="showTab('about')">👤 <span>About</span></button>
     </div>
     <div class="nav-right-group">
@@ -517,7 +520,11 @@ footer b{color:var(--accent);font-family:var(--font-head)}
   <p style="margin-top:.5rem;font-size:.78rem">Made with passion 🚀 by <span style="color:var(--a2);font-weight:700;font-family:var(--font-head)">Ilyes Jeridi</span></p>
 </footer>
 <div class="toast" id="toast"></div>
+<div class="toast" id="toast"></div>
 
+<!-- Add these 2 lines: -->
+<script src="js/ai-math-solver.js"></script>
+<!-- AI Solver Modal HTML -->
 <script>
 // ╔══════════════════════════════════════════════════╗
 // ║        GOOGLE SHEETS DATABASE BRIDGE             ║
