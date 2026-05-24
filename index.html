@@ -1237,6 +1237,14 @@ stats();renderPosts();renderEx();
   // Load all data from Google Sheets
   loadAllData();
 })();
-<script>
+
+  <script>
+function open_(id){document.getElementById(id).classList.add('open');}
+function close_(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+</script>
+
+</body>
+</html>
 </body>
 </html>
