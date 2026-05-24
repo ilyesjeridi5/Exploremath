@@ -233,7 +233,6 @@ footer b{color:var(--accent);font-family:var(--font-head)}
       <button class="nbtn on" id="nb-home" onclick="goHome()">🏠 <span>Home</span></button>
       <button class="nbtn" id="nb-cours" onclick="showTab('cours')">📚 <span>Courses</span></button>
       <button class="nbtn" id="nb-ex" onclick="showTab('exercices')">✏️ <span>Exercises</span></button>
-      <button class="nbtn" onclick="openAISolver()">🤖 <span>AI Solver</span></button>
       <button class="nbtn" id="nb-about" onclick="showTab('about')">👤 <span>About</span></button>
     </div>
     <div class="nav-right-group">
@@ -1238,34 +1237,6 @@ stats();renderPosts();renderEx();
   // Load all data from Google Sheets
   loadAllData();
 })();
-
-</script>
-  <div class="overlay" id="ol-ai-solver">
-  <div class="modal wide">
-    <button class="xbtn" onclick="close_('ol-ai-solver')">✕</button>
-    <h2>🤖 AI Math Solver</h2>
-    <p class="msub">Powered by GitHub Models (GPT-4o)</p>
-    
-    <div class="fg">
-      <label>Enter your math problem *</label>
-      <textarea id="ai-problem-inp" placeholder="Example: Find the derivative of f(x) = 3x² + 2x + 1" style="min-height:120px"></textarea>
-    </div>
-    
-    <div style="display:flex;gap:.8rem;margin-bottom:1.5rem">
-      <button class="sub-btn" id="ai-solve-btn" onclick="solveMath()" style="flex:1">🚀 Solve</button>
-      <button class="bo" onclick="document.getElementById('ai-problem-inp').value='';document.getElementById('ai-result').innerHTML=''" style="padding:.85rem 2rem">Clear</button>
-    </div>
-    
-    <div id="ai-result"></div>
-    
-    <div style="margin-top:1.5rem;padding:1rem;background:var(--s2);border:1px solid var(--border);border-radius:8px;font-size:.82rem;color:var(--muted)">
-      <strong>⚙️ Setup Required:</strong><br>
-      You need to set your GitHub Models API token. Open browser console and run:<br>
-      <code style="background:var(--s3);padding:.3rem .5rem;border-radius:4px;color:var(--accent);word-break:break-all;display:inline-block;margin-top:0.4rem">localStorage.setItem('gh_models_token', 'your_github_personal_access_token')</code>
-    </div>
-  </div>
-</div>
-
 <script>
 </body>
 </html>
