@@ -187,12 +187,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:990;padding:0 1.5rem;height:68px
 .toast.show{transform:translateX(-50%) translateY(0)}
 footer{border-top:1px solid var(--border);text-align:center;padding:2rem;color:var(--muted);font-size:.82rem;margin-top:2rem}
 footer b{color:var(--accent);font-family:var(--font-head)}
-/* ── LANG SWITCHER ── */
 .lang-switch{display:flex;align-items:center;gap:.25rem;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:.2rem;margin-left:.4rem}
 .lang-btn{background:none;border:none;color:var(--muted);font-size:.72rem;font-weight:700;padding:.28rem .6rem;border-radius:6px;cursor:pointer;transition:all .18s;letter-spacing:.04em;font-family:var(--font-body)}
 .lang-btn.on{background:linear-gradient(120deg,var(--accent),var(--a2));color:#fff}
-
-/* ── SEARCH + FILTER BAR ── */
 .toolbar{max-width:1160px;margin:0 auto;padding:.9rem 2rem .5rem;display:flex;flex-direction:column;gap:.7rem}
 .search-wrap{display:flex;align-items:center;gap:.6rem;background:var(--s2);border:1.5px solid var(--border);border-radius:14px;padding:.65rem 1rem;transition:all .2s}
 .search-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,109,250,.12)}
@@ -209,6 +206,8 @@ footer b{color:var(--accent);font-family:var(--font-head)}
 .filter-reset{background:none;border:1px solid var(--border);color:var(--muted);padding:.35rem .75rem;border-radius:9px;font-size:.72rem;font-family:var(--font-body);cursor:pointer;transition:all .18s;font-weight:600}
 .filter-reset:hover{border-color:var(--red);color:var(--red)}
 .result-count{font-size:.78rem;color:var(--muted);padding:.1rem 2rem;max-width:1160px;margin:0 auto}
+/* DB status badge */
+#db-status{font-size:.72rem;color:var(--muted);padding:.3rem .7rem;background:var(--s2);border:1px solid var(--border);border-radius:8px;white-space:nowrap}
 
 @media(max-width:640px){
   .hero h1{font-size:2.4rem}.stats{grid-template-columns:repeat(2,1fr)}
@@ -230,12 +229,13 @@ footer b{color:var(--accent);font-family:var(--font-head)}
   <div class="logo" onclick="goHome()">Explore<b>Math</b></div>
   <div class="nav-r">
     <div class="nav-links-group">
-      <button class="nbtn on" id="nb-home" onclick="goHome()">🏠 <span>Home</span></button>
-      <button class="nbtn" id="nb-cours" onclick="showTab('cours')">📚 <span>Courses</span></button>
-      <button class="nbtn" id="nb-ex" onclick="showTab('exercices')">✏️ <span>Exercises</span></button>
-      <button class="nbtn" id="nb-about" onclick="showTab('about')">👤 <span>About</span></button>
+      <button class="nbtn on" id="nb-home" onclick="goHome()">🏠 <span class="nav-label">Home</span></button>
+      <button class="nbtn" id="nb-cours" onclick="showTab('cours')">📚 <span class="nav-label">Courses</span></button>
+      <button class="nbtn" id="nb-ex" onclick="showTab('exercices')">✏️ <span class="nav-label">Exercises</span></button>
+      <button class="nbtn" id="nb-about" onclick="showTab('about')">👤 <span class="nav-label">About</span></button>
     </div>
     <div class="nav-right-group">
+      <span id="db-status">⏳ Loading…</span>
       <button class="nbtn admin-btn" id="nb-admin" onclick="adminClick()">🔐 <span class="admin-label">Admin</span></button>
       <div class="lang-switch">
         <button class="lang-btn on" id="lb-en" onclick="setLang('en',this)">EN</button>
@@ -247,8 +247,8 @@ footer b{color:var(--accent);font-family:var(--font-head)}
 
 <section class="hero">
   <div class="badge">✦ By Ilyes Jeridi</div>
-  <h1>Learn,<br><span class="grad">Explore & Innovate</span></h1>
-  <p>Math, physics, robotics lessons and interactive exercises — shared with passion.</p>
+  <h1>Learn,<br><span class="grad">Explore &amp; Innovate</span></h1>
+  <p id="hero-sub">Math, physics, robotics lessons and interactive exercises — shared with passion.</p>
   <div class="hbtns">
     <button class="bp" onclick="showTab('cours')">📖 Browse Courses</button>
     <button class="bo" onclick="showTab('exercices')">✏️ Exercises</button>
@@ -257,7 +257,7 @@ footer b{color:var(--accent);font-family:var(--font-head)}
 
 <div class="tab-bar">
   <div class="tabs">
-    <button class="tab on" id="tab-cours" onclick="showTab('cours')">📚 Courses & Documents</button>
+    <button class="tab on" id="tab-cours" onclick="showTab('cours')">📚 Courses &amp; Documents</button>
     <button class="tab" id="tab-exercices" onclick="showTab('exercices')">✏️ Exercises</button>
     <button class="tab" id="tab-about" onclick="showTab('about')">👤 About</button>
   </div>
@@ -270,7 +270,6 @@ footer b{color:var(--accent);font-family:var(--font-head)}
   <div class="cp ro" onclick="filter('robotics',this)">🤖 <span class="t" data-en="Robotics" data-fr="Robotique">Robotics</span></div>
 </div>
 
-<!-- TOOLBAR: Search + Filters -->
 <div class="toolbar" id="toolbar">
   <div class="search-wrap">
     <span class="search-ico">🔍</span>
@@ -279,33 +278,33 @@ footer b{color:var(--accent);font-family:var(--font-head)}
   </div>
   <div class="filter-row" id="filter-row">
     <div class="filter-group">
-      <span class="filter-lbl t" data-en="Level" data-fr="Niveau">Level</span>
+      <span class="filter-lbl" id="lbl-level">Level</span>
       <select class="fsel" id="f-level" onchange="applyFilters()">
-        <option value="" data-en="All levels" data-fr="Tous niveaux">All levels</option>
-        <option value="Beginner" data-en="Beginner" data-fr="Débutant">Beginner</option>
-        <option value="Intermediate" data-en="Intermediate" data-fr="Intermédiaire">Intermediate</option>
-        <option value="Advanced" data-en="Advanced" data-fr="Avancé">Advanced</option>
+        <option value="">All levels</option>
+        <option value="Beginner">Beginner</option>
+        <option value="Intermediate">Intermediate</option>
+        <option value="Advanced">Advanced</option>
       </select>
     </div>
     <div class="filter-group" id="fg-type">
-      <span class="filter-lbl t" data-en="Type" data-fr="Type">Type</span>
+      <span class="filter-lbl" id="lbl-type">Type</span>
       <select class="fsel" id="f-type" onchange="applyFilters()">
-        <option value="" data-en="All types" data-fr="Tous types">All types</option>
-        <option value="pdf" data-en="PDF" data-fr="PDF">PDF</option>
-        <option value="doc" data-en="Word" data-fr="Word">Word</option>
-        <option value="text" data-en="Text" data-fr="Texte">Text</option>
+        <option value="">All types</option>
+        <option value="pdf">PDF</option>
+        <option value="doc">Word</option>
+        <option value="text">Text</option>
       </select>
     </div>
     <div class="filter-group" id="fg-diff">
-      <span class="filter-lbl t" data-en="Difficulty" data-fr="Difficulté">Difficulty</span>
+      <span class="filter-lbl" id="lbl-diff">Difficulty</span>
       <select class="fsel" id="f-diff" onchange="applyFilters()">
-        <option value="" data-en="All" data-fr="Tous">All</option>
-        <option value="1" data-en="Easy" data-fr="Facile">Easy</option>
-        <option value="2" data-en="Medium" data-fr="Moyen">Medium</option>
-        <option value="3" data-en="Hard" data-fr="Difficile">Hard</option>
+        <option value="">All</option>
+        <option value="1">Easy</option>
+        <option value="2">Medium</option>
+        <option value="3">Hard</option>
       </select>
     </div>
-    <button class="filter-reset" onclick="resetFilters()" id="reset-btn">↺ <span class="t" data-en="Reset" data-fr="Réinitialiser">Reset</span></button>
+    <button class="filter-reset" onclick="resetFilters()">↺ Reset</button>
   </div>
 </div>
 <div class="result-count" id="result-count"></div>
@@ -320,7 +319,7 @@ footer b{color:var(--accent);font-family:var(--font-head)}
 
   <div id="sec-cours">
     <div class="sec-hd">
-      <h2>📚 Courses & Documents</h2>
+      <h2>📚 Courses &amp; Documents</h2>
       <p id="flt-lbl">All publications</p>
     </div>
     <div class="grid" id="grid"></div>
@@ -517,185 +516,94 @@ footer b{color:var(--accent);font-family:var(--font-head)}
   <p style="margin-top:.5rem;font-size:.78rem">Made with passion 🚀 by <span style="color:var(--a2);font-weight:700;font-family:var(--font-head)">Ilyes Jeridi</span></p>
 </footer>
 
-<script>
-// ╔══════════════════════════════════════════════════╗
-// ║        GOOGLE SHEETS DATABASE BRIDGE             ║
-// ╚══════════════════════════════════════════════════╝
+<!-- Single toast element (was duplicated) -->
+<div class="toast" id="toast"></div>
 
+<script>
+// ═══════════════════════════════════════════════════
+//  GOOGLE SHEETS DATABASE BRIDGE
+//  ▸ Replace DB_URL with your own Apps Script URL
+// ═══════════════════════════════════════════════════
 const DB_URL = "https://script.google.com/macros/s/AKfycbykaRtS1XJh009sJEmUec877qj12b0FDNpSFEV7wF5abDEiBM3u_5VMnRdtFa9eHEy7/exec";
-// Example:
-// const DB_URL = "https://script.google.com/macros/s/AKfycbXXXX.../exec";
 
 const DB = {
-
   async getAll(sheet) {
     try {
-      const url = DB_URL + "?sheet=" + sheet + "&action=getAll";
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("Network error: " + res.status);
+      const res = await fetch(DB_URL + "?sheet=" + sheet + "&action=getAll");
+      if (!res.ok) throw new Error("HTTP " + res.status);
       return await res.json();
-    } catch (err) {
-      console.error("[DB.getAll] Failed:", err.message);
-      return [];
-    }
+    } catch (err) { console.error("[DB.getAll]", err); return []; }
   },
-
-  async getById(sheet, id) {
-    try {
-      const url = DB_URL + "?sheet=" + sheet + "&action=getById&id=" + id;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("Network error: " + res.status);
-      return await res.json();
-    } catch (err) {
-      console.error("[DB.getById] Failed:", err.message);
-      return null;
-    }
-  },
-
   async insert(sheet, data) {
     try {
       const res = await fetch(DB_URL, {
         method: "POST",
-        body: JSON.stringify({ sheet: sheet, action: "insert", data: data })
+        body: JSON.stringify({ sheet, action: "insert", data })
       });
-      if (!res.ok) throw new Error("Network error: " + res.status);
+      if (!res.ok) throw new Error("HTTP " + res.status);
       return await res.json();
-    } catch (err) {
-      console.error("[DB.insert] Failed:", err.message);
-      return { success: false, error: err.message };
-    }
+    } catch (err) { console.error("[DB.insert]", err); return { success: false, error: err.message }; }
   },
-
-  async update(sheet, id, data) {
-    try {
-      const res = await fetch(DB_URL, {
-        method: "POST",
-        body: JSON.stringify({ sheet: sheet, action: "update", id: id, data: data })
-      });
-      if (!res.ok) throw new Error("Network error: " + res.status);
-      return await res.json();
-    } catch (err) {
-      console.error("[DB.update] Failed:", err.message);
-      return { success: false, error: err.message };
-    }
-  },
-
   async delete(sheet, id) {
     try {
       const res = await fetch(DB_URL, {
         method: "POST",
-        body: JSON.stringify({ sheet: sheet, action: "delete", id: id })
+        body: JSON.stringify({ sheet, action: "delete", id })
       });
-      if (!res.ok) throw new Error("Network error: " + res.status);
+      if (!res.ok) throw new Error("HTTP " + res.status);
       return await res.json();
-    } catch (err) {
-      console.error("[DB.delete] Failed:", err.message);
-      return { success: false, error: err.message };
-    }
+    } catch (err) { console.error("[DB.delete]", err); return { success: false, error: err.message }; }
   },
-
   async uploadFile(fileName, base64Data, fileType) {
     try {
       const base64 = base64Data.includes(',') ? base64Data.split(',')[1] : base64Data;
       const res = await fetch(DB_URL, {
         method: "POST",
-        body: JSON.stringify({ action: "uploadFile", fileName: fileName, base64: base64, fileType: fileType })
+        body: JSON.stringify({ action: "uploadFile", fileName, base64, fileType })
       });
-      if (!res.ok) throw new Error("Network error: " + res.status);
+      if (!res.ok) throw new Error("HTTP " + res.status);
       return await res.json();
-    } catch (err) {
-      console.error("[DB.uploadFile] Failed:", err.message);
-      return { success: false, error: err.message };
-    }
+    } catch (err) { console.error("[DB.uploadFile]", err); return { success: false, error: err.message }; }
   }
-
 };
 
-// ╔══════════════════════════════════════════════════╗
-// ║              END OF BRIDGE                       ║
-// ╚══════════════════════════════════════════════════╝
-
-// ── LANGUAGE ──
+// ═══════════════════════════════════════════════════
+//  LANGUAGE SYSTEM
+// ═══════════════════════════════════════════════════
 let LANG = 'en';
+
 const T = {
   en: {
-    searchPlaceholder: 'Search courses, exercises, tags...',
-    searchPlaceholderEx: 'Search exercises, tags...',
     allPub: n => `All publications (${n})`,
-    filteredPub: (lbl,n) => `${lbl} — ${n} result${n!==1?'s':''}`,
+    filteredPub: (lbl, n) => `${lbl} — ${n} result${n !== 1 ? 's' : ''}`,
     allEx: n => `All exercises (${n})`,
-    noCoursesAdmin: 'Click ＋ to publish',
-    noCoursesUser: 'Check back soon!',
-    noCourses: 'No courses yet',
-    noExAdmin: 'Click ＋ to add one',
-    noExUser: 'Check back soon!',
-    noEx: 'No exercises yet',
-    noResults: 'No results found',
-    noResultsSub: 'Try a different keyword or reset filters',
-    coursePublished: '🚀 Course published!',
-    exercisePublished: '✏️ Exercise published!',
-    deleted: '🗑 Deleted successfully',
-    loggedIn: '✅ Welcome, ExploreMath!',
+    noCoursesAdmin: 'Click ＋ to publish', noCoursesUser: 'Check back soon!', noCourses: 'No courses yet',
+    noExAdmin: 'Click ＋ to add one', noExUser: 'Check back soon!', noEx: 'No exercises yet',
+    noResults: 'No results found', noResultsSub: 'Try a different keyword or reset filters',
+    coursePublished: '🚀 Course published!', exercisePublished: '✏️ Exercise published!',
+    deleted: '🗑 Deleted successfully', loggedIn: '✅ Welcome, ExploreMath!',
     loggedOut: '👋 Logged out',
-    wrongPass: '❌ Incorrect password',
-    saved: '✅ Saved!',
-    requiredFields: '⚠️ Title, summary, and content (text or file) required',
-    fileTooBig: '⚠️ File too large (max 5 MB)',
-    pdfOnly: '⚠️ PDF files only',
-    pdfDocOnly: '⚠️ PDF, DOC or DOCX only',
-    diffLabels: ['','Easy','Medium','Hard'],
-    LBL: {math:'Mathematics', physics:'Physics', robotics:'Robotics'},
+    diffLabels: ['', 'Easy', 'Medium', 'Hard'],
+    LBL: { math: 'Mathematics', physics: 'Physics', robotics: 'Robotics' },
+    levels: ['Beginner', 'Intermediate', 'Advanced'],
     levelAll: 'All levels', typeAll: 'All types', diffAll: 'All',
-    levels: ['Beginner','Intermediate','Advanced'],
     filterLevel: 'Level', filterType: 'Type', filterDiff: 'Difficulty',
-    resetBtn: '↺ Reset',
-    mathTab: '📐 Mathematics', physTab: '⚛️ Physics', robTab: '🤖 Robotics',
-    allTab: '🔢 All',
-    coursesTab: '📚 Courses & Documents', exTab: '✏️ Exercises', aboutTab: '👤 About',
-    homeBtn: '🏠 Home', coursesBtn: '📚 Courses', exBtn: '✏️ Exercises', aboutBtn: '👤 About',
-    adminBtn: '🔐 Admin',
-    // form labels
-    newCourse: '📚 New Course', newEx: '✏️ New Exercise',
-    publishCourse: '🚀 Publish Course', publishEx: '🚀 Publish Exercise',
   },
   fr: {
-    searchPlaceholder: 'Rechercher cours, exercices, tags...',
-    searchPlaceholderEx: 'Rechercher exercices, tags...',
     allPub: n => `Toutes les publications (${n})`,
-    filteredPub: (lbl,n) => `${lbl} — ${n} résultat${n>1?'s':''}`,
+    filteredPub: (lbl, n) => `${lbl} — ${n} résultat${n > 1 ? 's' : ''}`,
     allEx: n => `Tous les exercices (${n})`,
-    noCoursesAdmin: 'Clique ＋ pour publier',
-    noCoursesUser: 'Reviens bientôt !',
-    noCourses: 'Aucun cours',
-    noExAdmin: 'Clique ＋ pour ajouter',
-    noExUser: 'Reviens bientôt !',
-    noEx: 'Aucun exercice',
-    noResults: 'Aucun résultat',
-    noResultsSub: 'Essaie un autre mot-clé ou réinitialise les filtres',
-    coursePublished: '🚀 Cours publié !',
-    exercisePublished: '✏️ Exercice publié !',
-    deleted: '🗑 Supprimé avec succès',
-    loggedIn: '✅ Bienvenue, ExploreMath !',
+    noCoursesAdmin: 'Clique ＋ pour publier', noCoursesUser: 'Reviens bientôt !', noCourses: 'Aucun cours',
+    noExAdmin: 'Clique ＋ pour ajouter', noExUser: 'Reviens bientôt !', noEx: 'Aucun exercice',
+    noResults: 'Aucun résultat', noResultsSub: 'Essaie un autre mot-clé ou réinitialise les filtres',
+    coursePublished: '🚀 Cours publié !', exercisePublished: '✏️ Exercice publié !',
+    deleted: '🗑 Supprimé avec succès', loggedIn: '✅ Bienvenue, ExploreMath !',
     loggedOut: '👋 Déconnecté',
-    wrongPass: '❌ Mot de passe incorrect',
-    saved: '✅ Sauvegardé !',
-    requiredFields: '⚠️ Titre, résumé et contenu requis',
-    fileTooBig: '⚠️ Fichier trop grand (max 5 MB)',
-    pdfOnly: '⚠️ PDF uniquement',
-    pdfDocOnly: '⚠️ PDF, DOC ou DOCX uniquement',
-    diffLabels: ['','Facile','Moyen','Difficile'],
-    LBL: {math:'Mathématiques', physics:'Physique', robotics:'Robotique'},
+    diffLabels: ['', 'Facile', 'Moyen', 'Difficile'],
+    LBL: { math: 'Mathématiques', physics: 'Physique', robotics: 'Robotique' },
+    levels: ['Débutant', 'Intermédiaire', 'Avancé'],
     levelAll: 'Tous niveaux', typeAll: 'Tous types', diffAll: 'Tous',
-    levels: ['Débutant','Intermédiaire','Avancé'],
     filterLevel: 'Niveau', filterType: 'Type', filterDiff: 'Difficulté',
-    resetBtn: '↺ Réinitialiser',
-    mathTab: '📐 Mathématiques', physTab: '⚛️ Physique', robTab: '🤖 Robotique',
-    allTab: '🔢 Tout voir',
-    coursesTab: '📚 Cours & Documents', exTab: '✏️ Exercices', aboutTab: '👤 À propos',
-    homeBtn: '🏠 Accueil', coursesBtn: '📚 Cours', exBtn: '✏️ Exercices', aboutBtn: '👤 À propos',
-    adminBtn: '🔐 Admin',
-    newCourse: '📚 Nouveau cours', newEx: '✏️ Nouvel exercice',
-    publishCourse: '🚀 Publier le cours', publishEx: "🚀 Publier l'exercice",
   }
 };
 
@@ -704,534 +612,583 @@ function setLang(lang, el) {
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('on'));
   el.classList.add('on');
   applyLangUI();
-  renderPosts(); renderEx();
+  renderPosts();
+  renderEx();
 }
 
 function applyLangUI() {
   const t = T[LANG];
   // Search placeholder
   const si = document.getElementById('search-inp');
-  if (si) si.placeholder = t.searchPlaceholder;
-  // Filter selects options text
+  if (si) si.placeholder = LANG === 'fr' ? 'Rechercher cours, exercices, tags...' : 'Search courses, exercises, tags...';
+  // Filter selects
   const fl = document.getElementById('f-level');
-  if (fl) {
-    fl.options[0].textContent = t.levelAll;
-    fl.options[1].textContent = t.levels[0];
-    fl.options[2].textContent = t.levels[1];
-    fl.options[3].textContent = t.levels[2];
-  }
+  if (fl) { fl.options[0].textContent = t.levelAll; fl.options[1].textContent = t.levels[0]; fl.options[2].textContent = t.levels[1]; fl.options[3].textContent = t.levels[2]; }
   const ft = document.getElementById('f-type');
   if (ft) ft.options[0].textContent = t.typeAll;
   const fd = document.getElementById('f-diff');
   if (fd) { fd.options[0].textContent = t.diffAll; fd.options[1].textContent = t.diffLabels[1]; fd.options[2].textContent = t.diffLabels[2]; fd.options[3].textContent = t.diffLabels[3]; }
-  // filter labels
-  document.querySelectorAll('.filter-lbl').forEach(el => {
-    const key = el.dataset.key;
-    if (key && t[key]) el.textContent = t[key];
-  });
-  // tabs
-  const tc = document.getElementById('tab-cours');
-  const te = document.getElementById('tab-exercices');
-  const ta = document.querySelector('#app > div > div.tabs > button:nth-child(3)');
-  if (tc) tc.textContent = t.coursesTab;
-  if (te) te.textContent = t.exTab;
-  // nav buttons
-  const nc = document.getElementById('nb-cours');
-  const ne = document.getElementById('nb-ex');
-  const nab = document.getElementById('nb-about');
-  if (nc) nc.innerHTML = t.coursesBtn;
-  if (ne) ne.innerHTML = t.exBtn;
-  if (nab) nab.innerHTML = t.aboutBtn;
-  // cat pills
-  document.querySelectorAll('.cp span.t, .filter-lbl.t, .tab .t').forEach(el => {
-    const en = el.dataset.en; const fr = el.dataset.fr;
-    if (en && fr) el.textContent = LANG === 'en' ? en : fr;
+  // Filter labels
+  const lblLevel = document.getElementById('lbl-level');
+  const lblType = document.getElementById('lbl-type');
+  const lblDiff = document.getElementById('lbl-diff');
+  if (lblLevel) lblLevel.textContent = t.filterLevel;
+  if (lblType) lblType.textContent = t.filterType;
+  if (lblDiff) lblDiff.textContent = t.filterDiff;
+  // Nav buttons (preserve emoji + span structure)
+  document.getElementById('nb-home').innerHTML = '🏠 <span class="nav-label">' + (LANG === 'fr' ? 'Accueil' : 'Home') + '</span>';
+  document.getElementById('nb-cours').innerHTML = '📚 <span class="nav-label">' + (LANG === 'fr' ? 'Cours' : 'Courses') + '</span>';
+  document.getElementById('nb-ex').innerHTML = '✏️ <span class="nav-label">' + (LANG === 'fr' ? 'Exercices' : 'Exercises') + '</span>';
+  document.getElementById('nb-about').innerHTML = '👤 <span class="nav-label">' + (LANG === 'fr' ? 'À propos' : 'About') + '</span>';
+  // Tabs
+  document.getElementById('tab-cours').textContent = LANG === 'fr' ? '📚 Cours & Documents' : '📚 Courses & Documents';
+  document.getElementById('tab-exercices').textContent = LANG === 'fr' ? '✏️ Exercices' : '✏️ Exercises';
+  document.getElementById('tab-about').textContent = LANG === 'fr' ? '👤 À propos' : '👤 About';
+  // Cat pills with data-en/fr
+  document.querySelectorAll('.cp span.t').forEach(el => {
+    if (el.dataset.en && el.dataset.fr) el.textContent = LANG === 'en' ? el.dataset.en : el.dataset.fr;
   });
 }
 
-const PASS='exploremath2025';
-const ICO={math:'📐',physics:'⚛️',robotics:'🤖'};
-const COL={math:'#7c6dfa',physics:'#3dd6f5',robotics:'#2de8a2'};
-const LBL={math:'Mathematics',physics:'Physics',robotics:'Robotics'};
-const CLS={math:'tm',physics:'tp',robotics:'tr'};
-const DIFF_LBL=['','Easy','Medium','Hard'];
-const DIFF_CLS=['','d1','d2','d3'];
+// ═══════════════════════════════════════════════════
+//  CONSTANTS & STATE
+// ═══════════════════════════════════════════════════
+const PASS = 'exploremath2025';
+const ICO = { math: '📐', physics: '⚛️', robotics: '🤖' };
+const COL = { math: '#7c6dfa', physics: '#3dd6f5', robotics: '#2de8a2' };
+const LBL = { math: 'Mathematics', physics: 'Physics', robotics: 'Robotics' };
+const CLS = { math: 'tm', physics: 'tp', robotics: 'tr' };
+const DIFF_CLS = ['', 'd1', 'd2', 'd3'];
 
-let admin=false,cf='all',fabOpen=false;
-let posts=[];
-let exercices=[];
-let curFile=null,curExQ=null,curExS=null;
+let admin = false, cf = 'all', fabOpen = false;
+let posts = [], exercices = [];
+let curFile = null, curExQ = null, curExS = null;
 
-// ── GOOGLE SHEETS SAVE / LOAD ──────────────────────────
-async function savePosts(){
-  // posts array is already up to date in memory — just refresh UI
-  stats(); renderPosts();
-}
-async function saveEx(){
-  stats(); renderEx();
-}
-
-async function loadAllData(){
+// ═══════════════════════════════════════════════════
+//  DATA LOADING
+// ═══════════════════════════════════════════════════
+async function loadAllData() {
   const dbStatus = document.getElementById('db-status');
-  if(dbStatus) dbStatus.textContent = '⏳ Loading data...';
+  if (dbStatus) { dbStatus.textContent = '⏳ Loading…'; dbStatus.style.display = ''; }
   try {
-    const [dbPosts, dbEx] = await Promise.all([
-      DB.getAll('posts'),
-      DB.getAll('exercices')
-    ]);
+    const [dbPosts, dbEx] = await Promise.all([DB.getAll('posts'), DB.getAll('exercices')]);
     posts = dbPosts.map(p => ({
       ...p,
-      id: String(p.id).trim(),
-      title: String(p.title||''),
-      summary: String(p.summary||''),
-      content: String(p.content||''),
-      tags: typeof p.tags==='string' ? p.tags.split(',').map(t=>t.trim()).filter(Boolean) : (p.tags||[]),
-      fileUrl: String(p.fileUrl||''),
-      fileData: String(p.fileUrl||'')
+      id: String(p.id || '').trim(),
+      title: String(p.title || ''),
+      summary: String(p.summary || ''),
+      content: String(p.content || ''),
+      tags: typeof p.tags === 'string' ? p.tags.split(',').map(t => t.trim()).filter(Boolean) : (p.tags || []),
+      fileUrl: String(p.fileUrl || ''),
     }));
     exercices = dbEx.map(e => ({
       ...e,
-      id: String(e.id).trim(),
-      title: String(e.title||''),
-      question: String(e.question||''),
-      solution: String(e.solution||''),
-      questionFile: String(e.questionFile||''),
-      questionFileName: String(e.questionFileName||''),
-      solutionFile: String(e.solutionFile||''),
-      solutionFileName: String(e.solutionFileName||''),
-      tags: typeof e.tags==='string' ? e.tags.split(',').map(t=>t.trim()).filter(Boolean) : (e.tags||[]),
-      diff: Number(e.diff)||1
+      id: String(e.id || '').trim(),
+      title: String(e.title || ''),
+      question: String(e.question || ''),
+      solution: String(e.solution || ''),
+      questionFile: String(e.questionFile || ''),
+      solutionFile: String(e.solutionFile || ''),
+      tags: typeof e.tags === 'string' ? e.tags.split(',').map(t => t.trim()).filter(Boolean) : (e.tags || []),
+      diff: Number(e.diff) || 1
     }));
-    if(dbStatus){ dbStatus.textContent='✅ Connected'; setTimeout(()=>{ if(dbStatus) dbStatus.style.display='none'; },3000); }
-    console.log('✅ DB loaded — posts:',posts.length,'| exercises:',exercices.length);
-  } catch(err) {
-    if(dbStatus){ dbStatus.textContent='❌ DB error'; dbStatus.style.color='var(--red)'; }
+    if (dbStatus) { dbStatus.textContent = '✅ Connected'; setTimeout(() => { if (dbStatus) dbStatus.style.display = 'none'; }, 3000); }
+    console.log('✅ Loaded — posts:', posts.length, '| exercises:', exercices.length);
+  } catch (err) {
+    if (dbStatus) { dbStatus.textContent = '❌ DB error'; dbStatus.style.color = 'var(--red)'; }
     console.error('DB load error:', err);
   }
   stats(); renderPosts(); renderEx();
 }
-function stats(){
-  document.getElementById('s0').textContent=posts.filter(p=>p.cat==='math').length;
-  document.getElementById('s1').textContent=posts.filter(p=>p.cat==='physics').length;
-  document.getElementById('s2').textContent=posts.filter(p=>p.cat==='robotics').length;
-  document.getElementById('s3').textContent=exercices.length;
+
+function stats() {
+  document.getElementById('s0').textContent = posts.filter(p => p.cat === 'math').length;
+  document.getElementById('s1').textContent = posts.filter(p => p.cat === 'physics').length;
+  document.getElementById('s2').textContent = posts.filter(p => p.cat === 'robotics').length;
+  document.getElementById('s3').textContent = exercices.length;
 }
 
+// ═══════════════════════════════════════════════════
+//  FILTERING & SEARCH
+// ═══════════════════════════════════════════════════
 function getFilters() {
   return {
     cat: cf,
-    search: (document.getElementById('search-inp')?.value||'').trim().toLowerCase(),
-    level: document.getElementById('f-level')?.value||'',
-    type: document.getElementById('f-type')?.value||'',
-    diff: document.getElementById('f-diff')?.value||'',
+    search: (document.getElementById('search-inp')?.value || '').trim().toLowerCase(),
+    level: document.getElementById('f-level')?.value || '',
+    type: document.getElementById('f-type')?.value || '',
+    diff: document.getElementById('f-diff')?.value || '',
   };
 }
 
 function matchesSearch(item, q) {
   if (!q) return true;
-  const haystack = [item.title||'', item.summary||'', item.content||'', item.question||'', (item.tags||[]).join(' ')].join(' ').toLowerCase();
-  return q.split(' ').every(w => haystack.includes(w));
+  const hay = [item.title || '', item.summary || '', item.content || '', item.question || '', (item.tags || []).join(' ')].join(' ').toLowerCase();
+  return q.split(' ').every(w => hay.includes(w));
 }
 
 function highlightText(text, q) {
-  if (!q) return text;
+  if (!q || !text) return text || '';
   const words = q.split(' ').filter(Boolean);
   let result = text;
   words.forEach(w => {
-    const re = new RegExp('('+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')', 'gi');
+    const re = new RegExp('(' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
     result = result.replace(re, '<mark style="background:rgba(124,109,250,.3);color:var(--accent);border-radius:3px;padding:0 1px">$1</mark>');
   });
   return result;
 }
 
-function renderPosts(){
-  const g=document.getElementById('grid');
-  const t=T[LANG];
-  const {cat,search,level,type} = getFilters();
+// ═══════════════════════════════════════════════════
+//  RENDER COURSES
+// ═══════════════════════════════════════════════════
+function renderPosts() {
+  const g = document.getElementById('grid');
+  if (!g) return;
+  const t = T[LANG];
+  const { cat, search, level, type } = getFilters();
   let list = [...posts].reverse();
-  if(cat!=='all') list=list.filter(p=>p.cat===cat);
-  if(level) list=list.filter(p=>{
-    const l=p.level||'';
-    const map={'Beginner':'Beginner','Intermediate':'Intermediate','Advanced':'Advanced','Débutant':'Beginner','Intermédiaire':'Intermediate','Avancé':'Advanced'};
-    return (map[l]||l)===level;
+  if (cat !== 'all') list = list.filter(p => p.cat === cat);
+  if (level) list = list.filter(p => {
+    const map = { 'Débutant': 'Beginner', 'Intermédiaire': 'Intermediate', 'Avancé': 'Advanced' };
+    return (map[p.level] || p.level) === level;
   });
-  if(type) list=list.filter(p=>{
-    if(type==='text') return !p.fileType;
-    return p.fileType===type;
-  });
-  if(search) list=list.filter(p=>matchesSearch(p,search));
+  if (type) list = list.filter(p => type === 'text' ? !p.fileType : p.fileType === type);
+  if (search) list = list.filter(p => matchesSearch(p, search));
 
-  const rc=document.getElementById('result-count');
-  const fltLbl=document.getElementById('flt-lbl');
-  const lbl=cat==='all'?t.allPub(posts.length):t.filteredPub(t.LBL[cat],list.length);
-  if(fltLbl) fltLbl.textContent=lbl;
-  if(rc) rc.textContent=search||level||type?`${list.length} result${list.length!==1?'s':''} found`:'';
+  const fltLbl = document.getElementById('flt-lbl');
+  const rc = document.getElementById('result-count');
+  if (fltLbl) fltLbl.textContent = cat === 'all' ? t.allPub(posts.length) : t.filteredPub(t.LBL[cat], list.length);
+  if (rc) rc.textContent = (search || level || type) ? `${list.length} result${list.length !== 1 ? 's' : ''} found` : '';
 
-  if(!list.length){
-    const msg=search?`<div class="empty"><div class="ei">🔍</div><h3>${t.noResults}</h3><p>${t.noResultsSub}</p></div>`:
-      `<div class="empty"><div class="ei">📭</div><h3>${t.noCourses}</h3><p>${admin?t.noCoursesAdmin:t.noCoursesUser}</p></div>`;
-    g.innerHTML=msg;return;
+  if (!list.length) {
+    const msg = search
+      ? `<div class="empty"><div class="ei">🔍</div><h3>${t.noResults}</h3><p>${t.noResultsSub}</p></div>`
+      : `<div class="empty"><div class="ei">📭</div><h3>${t.noCourses}</h3><p>${admin ? t.noCoursesAdmin : t.noCoursesUser}</p></div>`;
+    g.innerHTML = msg; return;
   }
-  const fbTxt={pdf:`<span class="fbadge fb-pdf">📄 PDF</span>`,doc:`<span class="fbadge fb-doc">📝 Word</span>`,null:`<span class="fbadge fb-txt">📃 ${LANG==='fr'?'Texte':'Text'}</span>`};
-  const catLbl=t.LBL;
-  g.innerHTML=list.map(p=>{
-    const fb=fbTxt[p.fileType]||fbTxt[null];
-    const titleH=highlightText(p.title,search);
-    const summH=highlightText(p.summary,search);
+
+  const fbTxt = {
+    pdf: `<span class="fbadge fb-pdf">📄 PDF</span>`,
+    doc: `<span class="fbadge fb-doc">📝 Word</span>`,
+    '': `<span class="fbadge fb-txt">📃 ${LANG === 'fr' ? 'Texte' : 'Text'}</span>`
+  };
+
+  g.innerHTML = list.map(p => {
+    const fb = fbTxt[p.fileType || ''] || fbTxt[''];
+    const delLbl = LANG === 'fr' ? 'Supprimer' : 'Delete';
     return `<div class="card" style="--cc:${COL[p.cat]}" onclick="showDetail('${p.id}')">
       <div class="card-top">
         <div class="ci">${ICO[p.cat]}</div>
-        <div class="badges-row"><span class="ctag ${CLS[p.cat]}">${catLbl[p.cat]}</span>${fb}</div>
+        <div class="badges-row"><span class="ctag ${CLS[p.cat]}">${t.LBL[p.cat]}</span>${fb}</div>
       </div>
-      <h3>${titleH}</h3><p>${summH}</p>
-      <div class="card-foot"><span>📅 ${p.date}</span><span class="lv">${p.level}</span></div>
-      ${admin?`<div class="admin-actions" onclick="event.stopPropagation()">
-        <button class="dbtn" onclick="confirmDel('post','${p.id}')">🗑 ${LANG==='fr'?'Supprimer':'Delete'}</button>
-      </div>`:''}
+      <h3>${highlightText(p.title, search)}</h3>
+      <p>${highlightText(p.summary, search)}</p>
+      <div class="card-foot"><span>📅 ${p.date}</span><span class="lv">${p.level || ''}</span></div>
+      ${admin ? `<div class="admin-actions" onclick="event.stopPropagation()">
+        <button class="dbtn" onclick="confirmDel('post','${p.id}')">🗑 ${delLbl}</button>
+      </div>` : ''}
     </div>`;
   }).join('');
 }
 
-function renderEx(){
-  const g=document.getElementById('ex-grid');
-  const t=T[LANG];
-  const {cat,search,diff}=getFilters();
-  let list=[...exercices].reverse();
-  if(cat!=='all') list=list.filter(e=>e.cat===cat);
-  if(diff) list=list.filter(e=>String(e.diff)===diff);
-  if(search) list=list.filter(e=>matchesSearch(e,search));
+// ═══════════════════════════════════════════════════
+//  RENDER EXERCISES
+// ═══════════════════════════════════════════════════
+function renderEx() {
+  const g = document.getElementById('ex-grid');
+  if (!g) return;
+  const t = T[LANG];
+  const { cat, search, diff } = getFilters();
+  let list = [...exercices].reverse();
+  if (cat !== 'all') list = list.filter(e => e.cat === cat);
+  if (diff) list = list.filter(e => String(e.diff) === diff);
+  if (search) list = list.filter(e => matchesSearch(e, search));
 
-  const exLbl=document.getElementById('ex-lbl');
-  const rc=document.getElementById('result-count');
-  if(exLbl) exLbl.textContent=cat==='all'?t.allEx(exercices.length):`${t.LBL[cat]} — ${list.length}`;
-  if(rc) rc.textContent=(search||diff)?`${list.length} result${list.length!==1?'s':''} found`:'';
+  const exLbl = document.getElementById('ex-lbl');
+  if (exLbl) exLbl.textContent = cat === 'all' ? t.allEx(exercices.length) : `${t.LBL[cat]} — ${list.length}`;
 
-  if(!list.length){
-    const msg=search?`<div class="empty"><div class="ei">🔍</div><h3>${t.noResults}</h3><p>${t.noResultsSub}</p></div>`:
-      `<div class="empty"><div class="ei">✏️</div><h3>${t.noEx}</h3><p>${admin?t.noExAdmin:t.noExUser}</p></div>`;
-    g.innerHTML=msg;return;
+  if (!list.length) {
+    const msg = search
+      ? `<div class="empty"><div class="ei">🔍</div><h3>${t.noResults}</h3><p>${t.noResultsSub}</p></div>`
+      : `<div class="empty"><div class="ei">✏️</div><h3>${t.noEx}</h3><p>${admin ? t.noExAdmin : t.noExUser}</p></div>`;
+    g.innerHTML = msg; return;
   }
-  const DLBL=t.diffLabels;
-  const catLbl=t.LBL;
-  let n=0;
-  g.innerHTML=list.map(e=>{n++;
-    const titleH=highlightText(e.title,search);
-    const qH=highlightText(e.question||'',search);
-    const solBtn=LANG==='fr'?'Voir la solution':'View Solution';
-    const hideBtn=LANG==='fr'?'🙈 Cacher':'🙈 Hide';
+
+  const DLBL = t.diffLabels;
+  const solBtn = LANG === 'fr' ? 'Voir la solution' : 'View Solution';
+  const openQ = LANG === 'fr' ? "Ouvrir l'énoncé" : 'Open Question';
+  const openS = LANG === 'fr' ? 'Ouvrir la correction' : 'Open Solution';
+  const delLbl = LANG === 'fr' ? 'Supprimer' : 'Delete';
+  let n = 0;
+
+  g.innerHTML = list.map(e => {
+    n++;
     return `<div class="ex-card">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.7rem">
-        <div class="ex-num">${String(n).padStart(2,'0')}</div>
+        <div class="ex-num">${String(n).padStart(2, '0')}</div>
         <div style="display:flex;gap:.4rem;flex-wrap:wrap">
-          <span class="ctag ${CLS[e.cat]}">${catLbl[e.cat]}</span>
+          <span class="ctag ${CLS[e.cat]}">${t.LBL[e.cat]}</span>
           <span class="diff-badge ${DIFF_CLS[e.diff]}">${DLBL[e.diff]}</span>
         </div>
       </div>
-      <h3 style="font-family:var(--font-head);font-size:1rem;font-weight:700;margin-bottom:.5rem">${titleH}</h3>
-      ${e.questionFile?`<a class="dl-btn" style="margin:.6rem 0;display:inline-flex" href="${e.questionFile}" target="_blank" rel="noopener">📄 ${LANG==='fr'?'Ouvrir l\'énoncé':'Open Question'} (PDF)</a>`:
-        `<p style="color:var(--muted);font-size:.84rem;line-height:1.65;white-space:pre-wrap">${qH}</p>`}
-      ${(e.solutionFile||e.solution)?`<button class="solve-btn" onclick="toggleSol(this,'${LANG}')">👁 ${solBtn}</button>
-      <div class="solution">${e.solutionFile?`<a class="dl-btn" href="${e.solutionFile}" target="_blank" rel="noopener">📄 ${LANG==='fr'?'Ouvrir la correction':'Open Solution'} (PDF)</a>`:e.solution}</div>`:''}
+      <h3 style="font-family:var(--font-head);font-size:1rem;font-weight:700;margin-bottom:.5rem">${highlightText(e.title, search)}</h3>
+      ${e.questionFile
+        ? `<a class="dl-btn" style="margin:.6rem 0;display:inline-flex" href="${e.questionFile}" target="_blank" rel="noopener">📄 ${openQ} (PDF)</a>`
+        : `<p style="color:var(--muted);font-size:.84rem;line-height:1.65;white-space:pre-wrap">${highlightText(e.question, search)}</p>`}
+      ${(e.solutionFile || e.solution)
+        ? `<button class="solve-btn" onclick="toggleSol(this,'${LANG}')">👁 ${solBtn}</button>
+           <div class="solution">${e.solutionFile ? `<a class="dl-btn" href="${e.solutionFile}" target="_blank" rel="noopener">📄 ${openS} (PDF)</a>` : e.solution}</div>`
+        : ''}
       <div style="font-size:.73rem;color:var(--muted);margin-top:.8rem">📅 ${e.date}</div>
-      ${admin?`<div class="admin-actions">
-        <button class="dbtn" onclick="confirmDel('ex','${e.id}')">🗑 ${LANG==='fr'?'Supprimer':'Delete'}</button>
-      </div>`:''}
+      ${admin ? `<div class="admin-actions">
+        <button class="dbtn" onclick="confirmDel('ex','${e.id}')">🗑 ${delLbl}</button>
+      </div>` : ''}
     </div>`;
   }).join('');
 }
 
-function toggleSol(btn, lang){
-  const s=btn.nextElementSibling;s.classList.toggle('show');
-  const isShow=s.classList.contains('show');
-  if(lang==='fr') btn.textContent=isShow?'🙈 Cacher':'👁 Voir la solution';
-  else btn.textContent=isShow?'🙈 Hide':'👁 View Solution';
+function toggleSol(btn, lang) {
+  const s = btn.nextElementSibling;
+  s.classList.toggle('show');
+  const isShow = s.classList.contains('show');
+  btn.textContent = isShow
+    ? (lang === 'fr' ? '🙈 Cacher' : '🙈 Hide')
+    : (lang === 'fr' ? '👁 Voir la solution' : '👁 View Solution');
 }
 
-function filter(cat,el){
-  cf=cat;
-  document.querySelectorAll('.cp').forEach(e=>e.classList.remove('on'));
+// ═══════════════════════════════════════════════════
+//  NAVIGATION & TABS
+// ═══════════════════════════════════════════════════
+function filter(cat, el) {
+  cf = cat;
+  document.querySelectorAll('.cp').forEach(e => e.classList.remove('on'));
   el.classList.add('on');
-  renderPosts();renderEx();
+  renderPosts(); renderEx();
 }
 
-function doSearch(val){
-  const btn=document.getElementById('search-clear');
-  if(btn) btn.classList.toggle('on', val.length>0);
-  renderPosts();renderEx();
+function doSearch(val) {
+  const btn = document.getElementById('search-clear');
+  if (btn) btn.classList.toggle('on', val.length > 0);
+  renderPosts(); renderEx();
 }
 
-function clearSearch(){
-  const inp=document.getElementById('search-inp');
-  if(inp){inp.value='';inp.focus();}
-  const btn=document.getElementById('search-clear');
-  if(btn) btn.classList.remove('on');
-  renderPosts();renderEx();
+function clearSearch() {
+  const inp = document.getElementById('search-inp');
+  if (inp) { inp.value = ''; inp.focus(); }
+  const btn = document.getElementById('search-clear');
+  if (btn) btn.classList.remove('on');
+  renderPosts(); renderEx();
 }
 
-function applyFilters(){renderPosts();renderEx();}
+function applyFilters() { renderPosts(); renderEx(); }
 
-function resetFilters(){
-  const inp=document.getElementById('search-inp');if(inp)inp.value='';
-  const fl=document.getElementById('f-level');if(fl)fl.value='';
-  const ft=document.getElementById('f-type');if(ft)ft.value='';
-  const fd=document.getElementById('f-diff');if(fd)fd.value='';
-  const btn=document.getElementById('search-clear');if(btn)btn.classList.remove('on');
-  renderPosts();renderEx();
+function resetFilters() {
+  ['search-inp', 'f-level', 'f-type', 'f-diff'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const btn = document.getElementById('search-clear');
+  if (btn) btn.classList.remove('on');
+  renderPosts(); renderEx();
 }
 
-function showTab(tab){
-  document.getElementById('sec-cours').style.display=tab==='cours'?'':'none';
-  document.getElementById('sec-ex').style.display=tab==='exercices'?'':'none';
-  document.getElementById('sec-about').style.display=tab==='about'?'':'none';
-  const toolbarEl=document.getElementById('toolbar');
-  const catsEl=document.getElementById('cats-bar');
-  const rcEl=document.getElementById('result-count');
-  if(toolbarEl) toolbarEl.style.display=tab==='about'?'none':'';
-  if(catsEl) catsEl.style.display=tab==='about'?'none':'';
-  if(rcEl) rcEl.style.display=tab==='about'?'none':'';
-  // Show level+type filters for courses, diff filter for exercises
-  const fgType=document.getElementById('fg-type');
-  const fgDiff=document.getElementById('fg-diff');
-  const flevel=document.getElementById('f-level');
-  if(fgType) fgType.style.display=tab==='cours'?'':'none';
-  if(fgDiff) fgDiff.style.display=tab==='exercices'?'':'none';
-  if(flevel) flevel.parentElement.style.display=tab==='about'?'none':'';
-  // Reset diff when switching to courses, reset type when switching to ex
-  if(tab==='cours'){const fd=document.getElementById('f-diff');if(fd)fd.value='';}
-  if(tab==='exercices'){const ft=document.getElementById('f-type');if(ft)ft.value='';}
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
-  document.getElementById('tab-'+tab).classList.add('on');
-  document.querySelectorAll('.nbtn').forEach(b=>b.classList.remove('on'));
-  const nbMap={cours:'nb-cours',exercices:'nb-ex',about:'nb-about'};
-  if(document.getElementById(nbMap[tab]))document.getElementById(nbMap[tab]).classList.add('on');
-  window.scrollTo({top:400,behavior:'smooth'});
+function showTab(tab) {
+  document.getElementById('sec-cours').style.display = tab === 'cours' ? '' : 'none';
+  document.getElementById('sec-ex').style.display = tab === 'exercices' ? '' : 'none';
+  document.getElementById('sec-about').style.display = tab === 'about' ? '' : 'none';
+  const toolbarEl = document.getElementById('toolbar');
+  const catsEl = document.getElementById('cats-bar');
+  const rcEl = document.getElementById('result-count');
+  if (toolbarEl) toolbarEl.style.display = tab === 'about' ? 'none' : '';
+  if (catsEl) catsEl.style.display = tab === 'about' ? 'none' : '';
+  if (rcEl) rcEl.style.display = tab === 'about' ? 'none' : '';
+  // Show/hide relevant filter groups
+  const fgType = document.getElementById('fg-type');
+  const fgDiff = document.getElementById('fg-diff');
+  if (fgType) fgType.style.display = tab === 'cours' ? '' : 'none';
+  if (fgDiff) fgDiff.style.display = tab === 'exercices' ? '' : 'none';
+  // Reset cross-tab filters
+  if (tab === 'cours') { const fd = document.getElementById('f-diff'); if (fd) fd.value = ''; }
+  if (tab === 'exercices') { const ft = document.getElementById('f-type'); if (ft) ft.value = ''; }
+  // Tab active state
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  const tabEl = document.getElementById('tab-' + tab);
+  if (tabEl) tabEl.classList.add('on');
+  // Nav active state
+  document.querySelectorAll('.nbtn').forEach(b => b.classList.remove('on'));
+  const nbMap = { cours: 'nb-cours', exercices: 'nb-ex', about: 'nb-about' };
+  const nbEl = document.getElementById(nbMap[tab]);
+  if (nbEl) nbEl.classList.add('on');
+  window.scrollTo({ top: 400, behavior: 'smooth' });
 }
-function goHome(){
-  document.querySelectorAll('.nbtn').forEach(b=>b.classList.remove('on'));
+
+function goHome() {
+  document.querySelectorAll('.nbtn').forEach(b => b.classList.remove('on'));
   document.getElementById('nb-home').classList.add('on');
-  window.scrollTo({top:0,behavior:'smooth'});
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function adminClick(){
-  if(admin){
-    admin=false;
-    document.getElementById('nb-admin').innerHTML='🔐 <span class="admin-label">Admin</span>';
-    document.getElementById('nb-admin').classList.remove('admin-on');
-    document.getElementById('fab-wrap').style.display='none';
-    closeFab();renderPosts();renderEx();toast(T[LANG].loggedOut);return;
+// ═══════════════════════════════════════════════════
+//  ADMIN AUTH
+// ═══════════════════════════════════════════════════
+function adminClick() {
+  if (admin) {
+    admin = false;
+    const btn = document.getElementById('nb-admin');
+    btn.innerHTML = '🔐 <span class="admin-label">Admin</span>';
+    btn.classList.remove('admin-on');
+    document.getElementById('fab-wrap').style.display = 'none';
+    closeFab(); renderPosts(); renderEx(); toast(T[LANG].loggedOut); return;
   }
-  document.getElementById('lerr').style.display='none';
-  document.getElementById('pw').value='';open_('ol-login');
-  setTimeout(()=>document.getElementById('pw').focus(),300);
-}
-function doLogin(){
-  if(document.getElementById('pw').value===PASS){
-    admin=true;close_('ol-login');
-    document.getElementById('nb-admin').innerHTML='🟢 <span class="admin-label">Admin</span>';
-    document.getElementById('nb-admin').classList.add('admin-on');
-    document.getElementById('fab-wrap').style.display='flex';
-    renderPosts();renderEx();toast(T[LANG].loggedIn);
-  }else{document.getElementById('lerr').style.display='block';document.getElementById('pw').value='';}
+  document.getElementById('lerr').style.display = 'none';
+  document.getElementById('pw').value = '';
+  open_('ol-login');
+  setTimeout(() => document.getElementById('pw').focus(), 300);
 }
 
-function toggleFab(){fabOpen=!fabOpen;document.getElementById('fab-menu').classList.toggle('show',fabOpen);document.getElementById('fab').textContent=fabOpen?'✕':'＋';}
-function closeFab(){fabOpen=false;document.getElementById('fab-menu').classList.remove('show');document.getElementById('fab').textContent='＋';}
+function doLogin() {
+  if (document.getElementById('pw').value === PASS) {
+    admin = true;
+    close_('ol-login');
+    const btn = document.getElementById('nb-admin');
+    btn.innerHTML = '🟢 <span class="admin-label">Admin</span>';
+    btn.classList.add('admin-on');
+    document.getElementById('fab-wrap').style.display = 'flex';
+    renderPosts(); renderEx(); toast(T[LANG].loggedIn);
+  } else {
+    document.getElementById('lerr').style.display = 'block';
+    document.getElementById('pw').value = '';
+  }
+}
 
-function handleFile(file){if(file)readFile(file);}
-function handleDrop(e){e.preventDefault();document.getElementById('uz').classList.remove('drag');if(e.dataTransfer.files[0])readFile(e.dataTransfer.files[0]);}
-function readFile(file){
-  if(file.size>5*1024*1024){toast('⚠️ File too large (max 5 MB)',1);return;}
-  const ext=file.name.split('.').pop().toLowerCase();
-  if(!['pdf','doc','docx'].includes(ext)){toast('⚠️ PDF, DOC or DOCX only',1);return;}
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    curFile={name:file.name,type:ext==='pdf'?'pdf':'doc',data:ev.target.result,size:file.size};
-    const sz=file.size>1048576?(file.size/1048576).toFixed(1)+' MB':(file.size/1024).toFixed(0)+' KB';
-    document.getElementById('fp').style.display='flex';
-    document.getElementById('fp').className='fp';
-    document.getElementById('fp').innerHTML=`<span class="fp-ico">${ext==='pdf'?'📄':'📝'}</span>
+// ═══════════════════════════════════════════════════
+//  FAB
+// ═══════════════════════════════════════════════════
+function toggleFab() {
+  fabOpen = !fabOpen;
+  document.getElementById('fab-menu').classList.toggle('show', fabOpen);
+  document.getElementById('fab').textContent = fabOpen ? '✕' : '＋';
+}
+function closeFab() {
+  fabOpen = false;
+  document.getElementById('fab-menu').classList.remove('show');
+  document.getElementById('fab').textContent = '＋';
+}
+
+// ═══════════════════════════════════════════════════
+//  FILE HANDLING
+// ═══════════════════════════════════════════════════
+function handleFile(file) { if (file) readFile(file); }
+function handleDrop(e) { e.preventDefault(); document.getElementById('uz').classList.remove('drag'); if (e.dataTransfer.files[0]) readFile(e.dataTransfer.files[0]); }
+
+function readFile(file) {
+  if (file.size > 5 * 1024 * 1024) { toast('⚠️ File too large (max 5 MB)', 1); return; }
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (!['pdf', 'doc', 'docx'].includes(ext)) { toast('⚠️ PDF, DOC or DOCX only', 1); return; }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    curFile = { name: file.name, type: ext === 'pdf' ? 'pdf' : 'doc', data: ev.target.result, size: file.size };
+    const sz = file.size > 1048576 ? (file.size / 1048576).toFixed(1) + ' MB' : (file.size / 1024).toFixed(0) + ' KB';
+    const fp = document.getElementById('fp');
+    fp.style.display = 'flex'; fp.className = 'fp';
+    fp.innerHTML = `<span class="fp-ico">${ext === 'pdf' ? '📄' : '📝'}</span>
       <div class="fp-info"><div class="fp-name">${file.name}</div><div class="fp-sz">${sz}</div></div>
       <button class="fp-del" onclick="clearFile()">✕</button>`;
-    document.getElementById('uz').style.display='none';
+    document.getElementById('uz').style.display = 'none';
   };
   reader.readAsDataURL(file);
 }
-function clearFile(){curFile=null;document.getElementById('fp').style.display='none';document.getElementById('uz').style.display='';document.getElementById('fi').value='';}
 
-function handleFileEx(file,slot){if(file)readFileEx(file,slot);}
-function handleDropEx(e,slot){e.preventDefault();document.getElementById('uz-'+slot).classList.remove('drag');if(e.dataTransfer.files[0])readFileEx(e.dataTransfer.files[0],slot);}
-function readFileEx(file,slot){
-  if(file.size>5*1024*1024){toast('⚠️ File too large (max 5 MB)',1);return;}
-  if(file.name.split('.').pop().toLowerCase()!=='pdf'){toast('⚠️ PDF files only',1);return;}
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    const obj={name:file.name,data:ev.target.result,size:file.size};
-    if(slot==='eq')curExQ=obj; else curExS=obj;
-    const sz=file.size>1048576?(file.size/1048576).toFixed(1)+' MB':(file.size/1024).toFixed(0)+' KB';
-    document.getElementById('fp-'+slot).style.display='flex';
-    document.getElementById('fp-'+slot).className='fp';
-    document.getElementById('fp-'+slot).innerHTML=`<span class="fp-ico">📄</span>
+function clearFile() {
+  curFile = null;
+  document.getElementById('fp').style.display = 'none';
+  document.getElementById('uz').style.display = '';
+  document.getElementById('fi').value = '';
+}
+
+function handleFileEx(file, slot) { if (file) readFileEx(file, slot); }
+function handleDropEx(e, slot) { e.preventDefault(); document.getElementById('uz-' + slot).classList.remove('drag'); if (e.dataTransfer.files[0]) readFileEx(e.dataTransfer.files[0], slot); }
+
+function readFileEx(file, slot) {
+  if (file.size > 5 * 1024 * 1024) { toast('⚠️ File too large (max 5 MB)', 1); return; }
+  if (file.name.split('.').pop().toLowerCase() !== 'pdf') { toast('⚠️ PDF files only', 1); return; }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const obj = { name: file.name, data: ev.target.result, size: file.size };
+    if (slot === 'eq') curExQ = obj; else curExS = obj;
+    const sz = file.size > 1048576 ? (file.size / 1048576).toFixed(1) + ' MB' : (file.size / 1024).toFixed(0) + ' KB';
+    const fp = document.getElementById('fp-' + slot);
+    fp.style.display = 'flex'; fp.className = 'fp';
+    fp.innerHTML = `<span class="fp-ico">📄</span>
       <div class="fp-info"><div class="fp-name">${file.name}</div><div class="fp-sz">${sz}</div></div>
       <button class="fp-del" onclick="clearFileEx('${slot}')">✕</button>`;
-    document.getElementById('uz-'+slot).style.display='none';
+    document.getElementById('uz-' + slot).style.display = 'none';
   };
   reader.readAsDataURL(file);
 }
-function clearFileEx(slot){
-  if(slot==='eq')curExQ=null; else curExS=null;
-  document.getElementById('fp-'+slot).style.display='none';
-  document.getElementById('uz-'+slot).style.display='';
-  document.getElementById('fi-'+slot).value='';
+
+function clearFileEx(slot) {
+  if (slot === 'eq') curExQ = null; else curExS = null;
+  document.getElementById('fp-' + slot).style.display = 'none';
+  document.getElementById('uz-' + slot).style.display = '';
+  document.getElementById('fi-' + slot).value = '';
 }
-function openForm(){closeFab();['ft','fs','fco','ftg'].forEach(id=>document.getElementById(id).value='');clearFile();open_('ol-form');}
-function openExForm(){closeFab();['ext','exq','exs','extg'].forEach(id=>document.getElementById(id).value='');clearFileEx('eq');clearFileEx('es');open_('ol-ex-form');}
 
-async function submitPost(){
-  const t=document.getElementById('ft').value.trim();
-  const s=document.getElementById('fs').value.trim();
-  const c=document.getElementById('fco').value.trim();
-  if(!t||!s||(!c&&!curFile)){toast('⚠️ Title, summary, and content (text or file) required',1);return;}
-  const tags=document.getElementById('ftg').value.split(',').map(x=>x.trim()).filter(Boolean);
-  const d=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-  const id=Date.now();
+function openForm() {
+  closeFab();
+  ['ft', 'fs', 'fco', 'ftg'].forEach(id => document.getElementById(id).value = '');
+  clearFile(); open_('ol-form');
+}
 
-  let fileUrl='', fileName='', fileType='';
-  if(curFile){
-    toast('⏳ Uploading file to Drive...', 0);
-    const uploadResult = await DB.uploadFile(curFile.name, curFile.data, curFile.type);
-    if(!uploadResult.success){ toast('❌ Upload failed: '+(uploadResult.error||'unknown'),1); return; }
-    fileUrl=uploadResult.url; fileName=curFile.name; fileType=curFile.type;
+function openExForm() {
+  closeFab();
+  ['ext', 'exq', 'exs', 'extg'].forEach(id => document.getElementById(id).value = '');
+  clearFileEx('eq'); clearFileEx('es'); open_('ol-ex-form');
+}
+
+// ═══════════════════════════════════════════════════
+//  SUBMIT
+// ═══════════════════════════════════════════════════
+async function submitPost() {
+  const t = document.getElementById('ft').value.trim();
+  const s = document.getElementById('fs').value.trim();
+  const c = document.getElementById('fco').value.trim();
+  if (!t || !s || (!c && !curFile)) { toast('⚠️ Title, summary, and content (text or file) required', 1); return; }
+  const tags = document.getElementById('ftg').value.split(',').map(x => x.trim()).filter(Boolean);
+  const d = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  const id = 'p_' + Date.now();
+  let fileUrl = '', fileType = '', fileName = '';
+  if (curFile) {
+    toast('⏳ Uploading file…', 0);
+    const r = await DB.uploadFile(curFile.name, curFile.data, curFile.type);
+    if (!r.success) { toast('❌ Upload failed: ' + (r.error || 'unknown'), 1); return; }
+    fileUrl = r.url; fileName = curFile.name; fileType = curFile.type;
   }
-
-  toast('⏳ Saving course...', 0);
-  const safeId='p_'+id;
-  const newPost={id:safeId, title:t, cat:document.getElementById('fc').value,
-    summary:s, content:c, tags:tags.join(','), level:document.getElementById('fl').value,
-    date:d, fileType, fileName, fileUrl};
+  toast('⏳ Saving course…', 0);
+  const newPost = { id, title: t, cat: document.getElementById('fc').value, summary: s, content: c, tags: tags.join(','), level: document.getElementById('fl').value, date: d, fileType, fileName, fileUrl };
   const result = await DB.insert('posts', newPost);
-  if(result.success){
-    newPost.tags=tags;
+  if (result.success) {
+    newPost.tags = tags;
     posts.push(newPost);
-    savePosts(); close_('ol-form'); toast(T[LANG].coursePublished);
-  } else {
-    toast('❌ Save failed: '+(result.error||'unknown error'),1);
-  }
+    stats(); renderPosts();
+    close_('ol-form'); toast(T[LANG].coursePublished);
+  } else { toast('❌ Save failed: ' + (result.error || 'unknown'), 1); }
 }
 
-async function submitExercice(){
-  const t=document.getElementById('ext').value.trim();
-  const q=document.getElementById('exq').value.trim();
-  if(!t||((!q)&&(!curExQ))){toast('⚠️ Title and question (text or PDF) required',1);return;}
-  const tags=document.getElementById('extg').value.split(',').map(x=>x.trim()).filter(Boolean);
-  const d=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-  const id=Date.now();
-
-  let questionFile='', questionFileName='';
-  let solutionFile='', solutionFileName='';
-
-  if(curExQ){
-    toast('⏳ Uploading question PDF...', 0);
-    const r=await DB.uploadFile(curExQ.name, curExQ.data, 'pdf');
-    if(!r.success){ toast('❌ Question upload failed: '+(r.error||'unknown'),1); return; }
-    questionFile=r.url; questionFileName=curExQ.name;
+async function submitExercice() {
+  const t = document.getElementById('ext').value.trim();
+  const q = document.getElementById('exq').value.trim();
+  if (!t || (!q && !curExQ)) { toast('⚠️ Title and question (text or PDF) required', 1); return; }
+  const tags = document.getElementById('extg').value.split(',').map(x => x.trim()).filter(Boolean);
+  const d = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  const id = 'e_' + Date.now();
+  let questionFile = '', solutionFile = '';
+  if (curExQ) {
+    toast('⏳ Uploading question PDF…', 0);
+    const r = await DB.uploadFile(curExQ.name, curExQ.data, 'pdf');
+    if (!r.success) { toast('❌ Question upload failed', 1); return; }
+    questionFile = r.url;
   }
-  if(curExS){
-    toast('⏳ Uploading solution PDF...', 0);
-    const r=await DB.uploadFile(curExS.name, curExS.data, 'pdf');
-    if(!r.success){ toast('❌ Solution upload failed: '+(r.error||'unknown'),1); return; }
-    solutionFile=r.url; solutionFileName=curExS.name;
+  if (curExS) {
+    toast('⏳ Uploading solution PDF…', 0);
+    const r = await DB.uploadFile(curExS.name, curExS.data, 'pdf');
+    if (!r.success) { toast('❌ Solution upload failed', 1); return; }
+    solutionFile = r.url;
   }
-
-  toast('⏳ Saving exercise...', 0);
-  const safeId='e_'+id;
-  const newEx={id:safeId, title:t, cat:document.getElementById('exc').value,
-    diff:+document.getElementById('exd').value,
-    question:q, questionFile, questionFileName,
-    solution:document.getElementById('exs').value.trim(),
-    solutionFile, solutionFileName,
-    tags:tags.join(','), date:d};
+  toast('⏳ Saving exercise…', 0);
+  const newEx = { id, title: t, cat: document.getElementById('exc').value, diff: +document.getElementById('exd').value, question: q, questionFile, solution: document.getElementById('exs').value.trim(), solutionFile, tags: tags.join(','), date: d };
   const result = await DB.insert('exercices', newEx);
-  if(result.success){
-    newEx.tags=tags;
+  if (result.success) {
+    newEx.tags = tags;
     exercices.push(newEx);
-    saveEx(); close_('ol-ex-form'); toast(T[LANG].exercisePublished);
-  } else {
-    toast('❌ Save failed: '+(result.error||'unknown error'),1);
-  }
+    stats(); renderEx();
+    close_('ol-ex-form'); toast(T[LANG].exercisePublished);
+  } else { toast('❌ Save failed: ' + (result.error || 'unknown'), 1); }
 }
 
-let pendingDel={type:null,id:null};
-function confirmDel(type,id){
-  pendingDel={type,id};
-  document.getElementById('confirm-del').onclick=async ()=>{
-    const sheet = pendingDel.type==='post' ? 'posts' : 'exercices';
-    toast('⏳ Deleting...', 0);
+// ═══════════════════════════════════════════════════
+//  DELETE
+// ═══════════════════════════════════════════════════
+let pendingDel = { type: null, id: null };
+
+function confirmDel(type, id) {
+  pendingDel = { type, id };
+  document.getElementById('confirm-del').onclick = async () => {
+    const sheet = pendingDel.type === 'post' ? 'posts' : 'exercices';
+    toast('⏳ Deleting…', 0);
     const result = await DB.delete(sheet, String(pendingDel.id));
-    if(result.success){
-      if(pendingDel.type==='post') posts=posts.filter(p=>String(p.id)!==String(pendingDel.id));
-      else exercices=exercices.filter(e=>String(e.id)!==String(pendingDel.id));
-      savePosts(); saveEx();
+    if (result.success) {
+      if (pendingDel.type === 'post') posts = posts.filter(p => String(p.id) !== String(pendingDel.id));
+      else exercices = exercices.filter(e => String(e.id) !== String(pendingDel.id));
+      stats(); renderPosts(); renderEx();
       close_('ol-confirm'); toast(T[LANG].deleted);
-    } else {
-      toast('❌ Delete failed: '+(result.error||'unknown'), 1);
-    }
+    } else { toast('❌ Delete failed: ' + (result.error || 'unknown'), 1); }
   };
   open_('ol-confirm');
 }
 
-function showDetail(id){
-  const p=posts.find(x=>String(x.id)===String(id));if(!p)return;
-  const tags=(Array.isArray(p.tags)?p.tags:[]).map(t=>`<span class="ptag">#${t}</span>`).join('');
-  const driveUrl=p.fileUrl||p.fileData||'';
-  const fileBtn=driveUrl?`<a class="dl-btn" href="${driveUrl}" target="_blank" rel="noopener">
-    ${p.fileType==='pdf'?'📄':'📝'} Open ${p.fileName||'file'}</a>`:'';
-  document.getElementById('detail').innerHTML=`
+// ═══════════════════════════════════════════════════
+//  DETAIL MODAL
+// ═══════════════════════════════════════════════════
+function showDetail(id) {
+  const p = posts.find(x => String(x.id) === String(id));
+  if (!p) return;
+  const tags = (Array.isArray(p.tags) ? p.tags : []).map(t => `<span class="ptag">#${t}</span>`).join('');
+  const driveUrl = p.fileUrl || '';
+  const fileBtn = driveUrl ? `<a class="dl-btn" href="${driveUrl}" target="_blank" rel="noopener">${p.fileType === 'pdf' ? '📄' : '📝'} Open ${p.fileName || 'file'}</a>` : '';
+  document.getElementById('detail').innerHTML = `
     <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:1rem">
       <span style="font-size:1.8rem">${ICO[p.cat]}</span>
       <div>
         <span class="ctag ${CLS[p.cat]}">${LBL[p.cat]}</span>
-        ${p.fileType?`<span class="fbadge ${p.fileType==='pdf'?'fb-pdf':'fb-doc'}" style="margin-left:.4rem">${p.fileType==='pdf'?'📄 PDF':'📝 Word'}</span>`:''}
-        <div style="font-size:.75rem;color:var(--muted);margin-top:.3rem">📅 ${p.date} · ${p.level}</div>
+        ${p.fileType ? `<span class="fbadge ${p.fileType === 'pdf' ? 'fb-pdf' : 'fb-doc'}" style="margin-left:.4rem">${p.fileType === 'pdf' ? '📄 PDF' : '📝 Word'}</span>` : ''}
+        <div style="font-size:.75rem;color:var(--muted);margin-top:.3rem">📅 ${p.date} · ${p.level || ''}</div>
       </div>
     </div>
     <h2 style="font-family:var(--font-head);font-size:1.3rem;font-weight:800;margin-bottom:.6rem">${p.title}</h2>
     <p style="color:var(--muted);margin-bottom:1rem;font-size:.9rem;line-height:1.65">${p.summary}</p>
     ${fileBtn}
-    ${p.content?`<hr style="border-color:var(--border);margin:1rem 0"><div class="pbody">${p.content}</div>`:''}
-    ${tags?`<div class="ptags">${tags}</div>`:''}`;
+    ${p.content ? `<hr style="border-color:var(--border);margin:1rem 0"><div class="pbody">${p.content}</div>` : ''}
+    ${tags ? `<div class="ptags">${tags}</div>` : ''}`;
   open_('ol-detail');
 }
 
-function open_(id){document.getElementById(id).classList.add('open');}
-function close_(id){document.getElementById(id).classList.remove('open');}
-document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+// ═══════════════════════════════════════════════════
+//  MODAL HELPERS
+// ═══════════════════════════════════════════════════
+function open_(id) { document.getElementById(id).classList.add('open'); }
+function close_(id) { document.getElementById(id).classList.remove('open'); }
 
-function toast(msg,warn=0){
-  const t=document.getElementById('toast');t.textContent=msg;
-  t.style.borderColor=warn?'var(--red)':'var(--green)';t.style.color=warn?'var(--red)':'var(--green)';
-  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);
+document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => {
+  if (e.target === o) o.classList.remove('open');
+}));
+
+// ═══════════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════════
+function toast(msg, warn = 0) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderColor = warn ? 'var(--red)' : 'var(--green)';
+  t.style.color = warn ? 'var(--red)' : 'var(--green)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
 }
 
-// ── DB STATUS INDICATOR ──
-document.addEventListener('DOMContentLoaded', function(){
-  const nav = document.querySelector('.nav-r');
-  if(nav){
-    const s = document.createElement('span');
-    s.id = 'db-status';
-    s.style.cssText = 'font-size:.72rem;color:var(--muted);padding:.3rem .7rem;background:var(--s2);border:1px solid var(--border);border-radius:8px;white-space:nowrap';
-    s.textContent = '⏳ Loading...';
-    nav.appendChild(s);
-  }
-});
-
-stats();renderPosts();renderEx();
-// Init: hide diff filter (shown only on exercises tab)
-(function(){
-  const fd=document.getElementById('fg-diff');if(fd)fd.style.display='none';
+// ═══════════════════════════════════════════════════
+//  INIT — runs after DOM is fully parsed
+// ═══════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function () {
+  // Hide diff filter initially (only shown on exercises tab)
+  const fgDiff = document.getElementById('fg-diff');
+  if (fgDiff) fgDiff.style.display = 'none';
+  // Apply language UI
   applyLangUI();
-  // Load all data from Google Sheets
+  // Initial render with empty data (shows empty state)
+  stats(); renderPosts(); renderEx();
+  // Load data from Google Sheets
   loadAllData();
-})();
-
+});
+</script>
 </body>
 </html>
