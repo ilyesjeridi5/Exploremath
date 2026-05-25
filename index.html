@@ -1,43 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ExploreMath — Math · Physics · Robotics</title>
-
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-
-  <!-- 🔥 Firebase v8 compat SDKs (must load BEFORE your own scripts) -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
-<head>
-  <body>
-
-  <!-- 👇 PASTE THE TOP BAR HERE — first thing inside <body> -->
-  <div class="top-bar" id="topBar" style="display:none;">
-    <div class="user-pill">
-      <div class="avatar" id="userAvatar">U</div>
-      <div>
-        <span class="uname" id="userName">User</span>
-        <span class="uemail" id="userEmail"></span>
-      </div>
-    </div>
-    <button class="logout-btn" onclick="doLogout()">Logout</button>
-  </div>
-  <!-- 👆 END OF TOP BAR -->
-
-
-  <!-- Your existing site content (hero, sections, etc.) stays below -->
-  ...
-
-
-  <!-- Your existing auth modal stays where it is -->
-  <div id="firebaseAuthModal"> ... </div>
-
-</body>
-  <style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ExploreMath — Math · Physics · Robotics</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
 :root{
   --bg:#07090f;--surface:#0e1118;--s2:#151b27;--s3:#1c2436;
   --accent:#7c6dfa;--a2:#3dd6f5;--green:#2de8a2;--orange:#ff8c42;--red:#ff5e6d;
@@ -255,11 +223,49 @@ footer b{color:var(--accent);font-family:var(--font-head)}
   .nav-links-group .nbtn:not(#nb-home):not(#nb-cours){display:none}
 }
 </style>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
+<style>
+/* ===== Firebase Auth styles ===== */
+#firebaseAuthModal{display:none;position:fixed;z-index:12000;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,.82);backdrop-filter:blur(8px)}
+#firebaseAuthModal.show{display:flex}
+.fauth-modal{background:#181c25;padding:2.5rem 1.8rem 2rem;border-radius:22px;box-shadow:0 8px 48px #0a0a0c80;width:98vw;max-width:380px;position:relative}
+.fauth-modal h2{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:900;text-align:center;margin-bottom:.5rem;color:#fff}
+.fauth-btn{display:flex;align-items:center;justify-content:center;gap:.6rem;background:#fff;color:#252525;font-weight:700;box-shadow:0 2px 12px rgba(100,50,250,.16);border-radius:9px;padding:.8rem 0;font-size:1.05rem;border:none;width:100%;margin-bottom:1.1rem;cursor:pointer;transition:.18s}
+.fauth-btn:hover{background:#edf5fd}
+.fauth-or{color:#68768a;text-align:center;font-size:.92rem;margin:.7rem 0 .2rem;position:relative}
+.fauth-or:before,.fauth-or:after{content:'';position:absolute;top:50%;width:38%;height:1px;background:#272d36}
+.fauth-or:before{left:0}.fauth-or:after{right:0}
+.fauth-fields{margin-bottom:1.4rem}
+.fauth-fields input{width:100%;margin-top:.55rem;padding:.67rem .95rem;border-radius:8px;border:1.5px solid #353a45;background:#171a22;color:#eaeaea;font-size:1rem;margin-bottom:.87rem;font-family:'DM Sans',sans-serif}
+.fauth-fields input:focus{outline:none;border-color:#7c6dfa}
+.fauth-fields label{font-size:.8rem;font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;color:#adbff0;letter-spacing:.08em}
+.fauth-error{color:#fd5666;text-align:center;margin-bottom:.8rem;font-size:.92rem;font-weight:700;min-height:22px}
+.fauth-mini{text-align:center;font-size:.9rem;color:#adbff0;margin-bottom:1.2rem}
+
+/* ===== User pill in nav (upper-left area after logo) ===== */
+.user-pill{display:flex;align-items:center;gap:.55rem;padding:.25rem .85rem .25rem .25rem;background:linear-gradient(120deg,rgba(124,109,250,.18),rgba(61,214,245,.18));border:1px solid rgba(124,109,250,.35);border-radius:999px;font-family:'Syne',sans-serif;font-weight:700;color:#fff;margin-left:.6rem;flex-shrink:0;cursor:default}
+.user-pill .uavatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(120deg,#7c6dfa,#3dd6f5);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:.85rem;object-fit:cover}
+.user-pill .uname{font-size:.82rem;line-height:1.1;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.logout-mini{background:transparent;color:#fd5666;border:1px solid rgba(253,86,102,.4);padding:.3rem .65rem;border-radius:7px;font-family:'Syne',sans-serif;font-weight:700;cursor:pointer;font-size:.72rem;margin-left:.4rem;transition:.18s;flex-shrink:0}
+.logout-mini:hover{background:rgba(253,86,102,.15)}
+@media(max-width:640px){
+  .user-pill .uname{display:none}
+  .user-pill{margin-left:.3rem;padding:.25rem}
+  .logout-mini{padding:.25rem .5rem;font-size:.68rem;margin-left:.2rem}
+}
+</style>
 </head>
 <body>
 
 <nav>
   <div class="logo" onclick="goHome()">Explore<b>Math</b></div>
+  <div class="user-pill" id="userPill" style="display:none">
+    <div class="uavatar" id="userAvatar">U</div>
+    <span class="uname" id="userName">User</span>
+    <button class="logout-mini" onclick="doLogout()" title="Logout">⎋ Logout</button>
+  </div>
   <div class="nav-r">
     <div class="nav-links-group">
       <button class="nbtn on" id="nb-home" onclick="goHome()">🏠 <span>Home</span></button>
@@ -1252,12 +1258,132 @@ stats();renderPosts();renderEx();
   applyLangUI();
   // Load all data from Google Sheets
   loadAllData();
-})(); 
-  auth.onAuthStateChanged(user => {
-  if (user) showSite(user);   // logged in → show site + username top-left
-  else      hideSite();        // logged out → show login modal
-});
+})();
 </script>
- 
-</body>
+
+<!-- ===== Firebase Auth Modal ===== -->
+<div id="firebaseAuthModal">
+  <div class="fauth-modal">
+    <h2>🔐 Sign in to ExploreMath</h2>
+    <div class="fauth-mini">Your learning experience is secure &amp; private.</div>
+    <button class="fauth-btn" onclick="googleSignIn()">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_2013_Google.png" style="width:21px;height:21px;border-radius:50%" alt="G">
+      Sign in with Google
+    </button>
+    <div class="fauth-or">or</div>
+    <div class="fauth-fields">
+      <label for="firebase-email">Email</label>
+      <input id="firebase-email" type="email" placeholder="you@example.com" autocomplete="email">
+      <label for="firebase-pass">Password</label>
+      <input id="firebase-pass" type="password" placeholder="Password (min 6 chars)" autocomplete="current-password">
+    </div>
+    <div style="display:flex;gap:7px;justify-content:space-between;margin-bottom:.6rem">
+      <button class="fauth-btn" style="background:#7c6dfa;color:#fff;flex:1;padding:.65rem 0;font-size:.95rem;margin-bottom:0" onclick="doEmailLogin()">Login</button>
+      <button class="fauth-btn" style="background:#1c2436;color:#f0f7fd;flex:1;padding:.65rem 0;font-size:.95rem;border:1px solid #292d33;margin-bottom:0" onclick="doRegister()">Register</button>
+    </div>
+    <div class="fauth-error" id="firebaseAuthError"></div>
+  </div>
+</div>
+
+<!-- ===== Firebase Auth Logic ===== -->
+<script>
+(function(){
+  // 1. Your Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyBVdI7OjdSwiSN3C47sanSmj0BeX5acBKc",
+    authDomain: "chemphys3d.firebaseapp.com",
+    projectId: "chemphys3d",
+    storageBucket: "chemphys3d.firebasestorage.app",
+    messagingSenderId: "242382321033",
+    appId: "1:242382321033:web:a2b9401f354fe1c052dd58",
+    measurementId: "G-FDERFP24KP"
+  };
+
+  // 2. Initialize
+  firebase.initializeApp(firebaseConfig);
+  try { if(firebase.analytics) firebase.analytics(); } catch(e){}
+  const auth = firebase.auth();
+
+  // 3. Helpers
+  const $ = id => document.getElementById(id);
+  const showError = m => { const e=$('firebaseAuthError'); if(e) e.textContent=m||''; };
+
+  function openModal(){ $('firebaseAuthModal').classList.add('show'); }
+  function closeModal(){ $('firebaseAuthModal').classList.remove('show'); showError(''); }
+
+  // Hide entire site (everything except auth modal) until logged in
+  function hideSiteContent(){
+    document.querySelectorAll('body > *').forEach(el => {
+      if(el.id !== 'firebaseAuthModal' && el.tagName !== 'SCRIPT') el.style.display = 'none';
+    });
+    openModal();
+  }
+
+  function showSiteContent(user){
+    closeModal();
+    document.querySelectorAll('body > *').forEach(el => {
+      if(el.id !== 'firebaseAuthModal' && el.tagName !== 'SCRIPT') el.style.display = '';
+    });
+    // Hide sections that should stay hidden by default (about, exercises tabs)
+    const secAbout = $('sec-about'); if(secAbout) secAbout.style.display='none';
+    const secEx    = $('sec-ex');    if(secEx)    secEx.style.display='none';
+    // Hide FAB if not admin
+    if(typeof admin !== 'undefined' && !admin){
+      const fw=$('fab-wrap'); if(fw) fw.style.display='none';
+    }
+    // Hide diff filter (default state)
+    const fd=$('fg-diff'); if(fd) fd.style.display='none';
+
+    // Show user pill upper-left
+    const pill = $('userPill');
+    if(pill){
+      pill.style.display = 'flex';
+      const name  = user.displayName || (user.email ? user.email.split('@')[0] : 'User');
+      $('userName').textContent = name;
+      const av = $('userAvatar');
+      if(user.photoURL){
+        av.outerHTML = '<img id="userAvatar" class="uavatar" src="'+user.photoURL+'" alt="avatar">';
+      } else if(av) {
+        av.textContent = name.charAt(0).toUpperCase();
+      }
+    }
+  }
+
+  // 4. Public auth functions (called by buttons)
+  window.googleSignIn = function(){
+    showError('');
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider).catch(err => showError(err.message));
+  };
+  window.doEmailLogin = function(){
+    showError('');
+    const email = $('firebase-email').value.trim();
+    const pass  = $('firebase-pass').value;
+    if(!email || !pass) return showError('Please fill in both fields.');
+    auth.signInWithEmailAndPassword(email, pass).catch(err => showError(err.message));
+  };
+  window.doRegister = function(){
+    showError('');
+    const email = $('firebase-email').value.trim();
+    const pass  = $('firebase-pass').value;
+    if(!email || !pass) return showError('Please fill in both fields.');
+    if(pass.length < 6) return showError('Password must be at least 6 characters.');
+    auth.createUserWithEmailAndPassword(email, pass)
+      .then(cred => cred.user.updateProfile({ displayName: email.split('@')[0] }))
+      .catch(err => showError(err.message));
+  };
+  window.doLogout = function(){ auth.signOut(); };
+
+  // 5. Hide site immediately while we check auth state
+  hideSiteContent();
+
+  // 6. Listen for login / logout
+  auth.onAuthStateChanged(user => {
+    if(user) showSiteContent(user);
+    else     hideSiteContent();
+  });
+})();
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a016e46c0e522a48',t:'MTc3OTczNjc3Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
+
