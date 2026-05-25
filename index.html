@@ -1,6 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <style>
+  /* Top-right user header bar alignment rules */
+  .secure-header {
+    position: fixed;
+    top: 15px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 9999; /* Keeps it layered cleanly on top of graphs/math tools */
+    background: rgba(255, 255, 255, 0.95);
+    padding: 6px 14px;
+    border-radius: 25px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    font-family: sans-serif;
+  }
+  .secure-header .user-badge {
+    font-size: 14px;
+    color: #333;
+    font-weight: bold;
+  }
+  .secure-header .logout-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  .secure-header .logout-btn:hover { background-color: #bd2130; }
+</style>
+
+<div class="secure-header">
+  <span class="user-badge" id="headerUsername">Checking Auth...</span>
+  <button class="logout-btn" id="headerLogoutBtn">Log Out</button>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBVdI7OjdSwiSN3C47sanSmj0BeX5acBKc",
+    authDomain: "chemphys3d.firebaseapp.com",
+    projectId: "chemphys3d",
+    storageBucket: "chemphys3d.firebasestorage.app",
+    messagingSenderId: "242382321033",
+    appId: "1:242382321033:web:a2b9401f354fe1c052dd58",
+    measurementId: "G-FDERFP24KP",
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  // Route protection framework
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      // User is verified! Place email string cleanly onto header container component
+      document.getElementById("headerUsername").textContent = `👤 ${user.email}`;
+    } else {
+      // Kick intruders back to index.html immediately
+      window.location.href = "index.html";
+    }
+  });
+
+  // Attach execution handler explicitly to Logout element
+  document.getElementById("headerLogoutBtn").addEventListener("click", () => {
+    auth.signOut();
+  });
+</script>
 <title>ExploreMath — Math · Physics · Robotics</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <style>
