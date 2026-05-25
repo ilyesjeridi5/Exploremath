@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ExploreMath — Math · Physics · Robotics</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+<style>
+  /* ---------- Base ---------- */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #0b0d12;
+    color: #eaeaea;
+    min-height: 100vh;
+  }
+
+  /* ---------- Top Bar with User Info (upper-left) ---------- */
+  .top-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 64px;
+    background: rgba(15, 18, 26, 0.85);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid #1f2330;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.4rem;
+    z-index: 9000;
+  }
+  .user-pill {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    padding: .35rem .9rem .35rem .35rem;
+    background: linear-gradient(120deg, rgba(124,109,250,.18), rgba(61,214,245,.18));
+    border: 1px solid rgba(124,109,250,.35);
+    border-radius: 999px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    color: #fff;
+  }
+  .user-pill img, .user-pill .avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(120deg,#7c6dfa,#3dd6f5);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 900; font-size: 1rem;
+    object-fit: cover;
+  }
+  .user-pill .uname { font-size: .98rem; }
+  .user-pill .uemail { font-size: .75rem; color:#adbff0; font-weight:400; display:block; }
+  .logout-btn {
+    background: transparent;
+    color: #fd5666;
+    border: 1px solid #fd566640;
+    padding: .45rem .9rem;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: .85rem;
+    transition: .18s;
+  }
+  .logout-btn:hover { background:#fd566622; }
+
+  /* ---------- Site Hero (placeholder content) ---------- */
+  .site-content {
+    padding: 110px 2rem 4rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .site-content h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 3rem; font-weight: 900;
+    background: linear-gradient(120deg,#7c6dfa,#3dd6f5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+  }
+  .site-content p { color:#adbff0; line-height:1.6; font-size:1.1rem; }
+
+  /* ---------- Firebase Auth Modal ---------- */
+  #firebaseAuthModal {
+    display: none;
+    position: fixed; z-index: 12000; inset: 0;
+    align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.82);
+    backdrop-filter: blur(8px);
+  }
+  #firebaseAuthModal.show { display: flex; }
+  .fauth-modal {
+    background:#181c25;
+    padding:2.5rem 1.8rem 2rem;
+    border-radius:22px;
+    box-shadow:0 8px 48px #0a0a0c80;
+    width:98vw; max-width:355px;
+    position:relative;
+  }
+  .fauth-modal h2 {
+    font-family:'Syne',sans-serif;
+    font-size:1.5rem; font-weight:900;
+    text-align:center; margin-bottom:.8rem;
+    color:#fff;
+  }
+  .fauth-btn {
+    display:flex; align-items:center; justify-content:center; gap:.6rem;
+    background:#fff; color:#252525;
+    font-weight:700;
+    box-shadow:0 2px 12px rgba(100,50,250,.16);
+    border-radius:9px; padding:.8rem 0;
+    font-size:1.08rem; border:none;
+    width:100%; margin-bottom:1.1rem;
+    cursor:pointer; transition:.18s;
+  }
+  .fauth-btn:hover { background:#edf5fd; }
+  .fauth-or {
+    color:#68768a; text-align:center;
+    font-size:.92rem; margin:.7rem 0 .2rem;
+    position:relative;
+  }
+  .fauth-or:before, .fauth-or:after {
+    content:''; position:absolute; top:50%;
+    width:38%; height:1px; background:#272d36;
+  }
+  .fauth-or:before { left:0; }
+  .fauth-or:after { right:0; }
+  .fauth-fields { margin-bottom:1.4rem; }
+  .fauth-fields input {
+    width:100%; margin-top:0.55rem;
+    padding:0.67rem 0.95rem;
+    border-radius:8px;
+    border:1.5px solid #353a45;
+    background:#171a22; color:#eaeaea;
+    font-size:1rem; margin-bottom:.87rem;
+  }
+  .fauth-fields label {
+    font-size:.85rem;
+    font-family:'Syne',sans-serif;
+    font-weight:700; text-transform:uppercase;
+    color:#adbff0; letter-spacing:.08em;
+  }
+  .fauth-error {
+    color:#fd5666; text-align:center;
+    margin-bottom:.8rem; font-size:.98rem;
+    font-weight:700; min-height:22px;
+  }
+  .fauth-mini { text-align:center; font-size:.93rem; color:#adbff0; margin-bottom:1rem; }
+
+  /* ---------- AI floating button ---------- */
+  .ai-fab-btn {
+    position:fixed; bottom:1.6rem; right:1.6rem;
+    z-index:10010;
+    padding:.9rem 1.6rem;
+    background:linear-gradient(120deg,#7c6dfa,#3dd6f5);
+    color:#fff; font-family:'Syne',sans-serif;
+    font-weight:900; font-size:1.11rem;
+    border-radius:25px;
+    box-shadow:0 4px 24px rgba(85,75,250,.34);
+    border:none; display:flex; align-items:center; gap:.65rem;
+    cursor:pointer; transition:transform .18s;
+  }
+  .ai-fab-btn:hover {
+    transform:scale(1.07);
+    background:linear-gradient(120deg,#3dd6f5,#7c6dfa);
+  }
+</style>
+
+<!-- Firebase v8 compat SDKs (work directly in browser, no build tool needed) -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
+</head>
+
+<body>
+
+  <!-- ===== TOP BAR (shown only after login) ===== -->
+  <div class="top-bar" id="topBar" style="display:none;">
+    <div class="user-pill" id="userPill">
+      <div class="avatar" id="userAvatar">U</div>
+      <div>
+        <span class="uname" id="userName">User</span>
+        <span class="uemail" id="userEmail"></span>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">Logout</button>
+  </div>
+
+  <!-- ===== SITE CONTENT (shown only after login) ===== -->
+  <main class="site-content" id="siteContent" style="display:none;">
+    <h1>Welcome to ExploreMath</h1>
+    <p>Math · Physics · Robotics — your interactive learning lab.</p>
+    <p style="margin-top:1rem;">You are now signed in. Replace this section with your real site content.</p>
+  </main>
+
+  <!-- ===== Firebase Auth Modal Overlay ===== -->
+  <div id="firebaseAuthModal">
+    <div class="fauth-modal">
+      <h2>🔐 Sign in to ExploreMath</h2>
+      <div class="fauth-mini">Your learning experience is secure &amp; private.</div>
+
+      <button class="fauth-btn" onclick="googleSignIn()">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_2013_Google.png"
+             style="width:21px;height:21px;border-radius:50%;" alt="Google">
+        Sign in with Google
+      </button>
+
+      <div class="fauth-or">or</div>
+
+      <div class="fauth-fields">
+        <label for="firebase-email">Email</label>
+        <input id="firebase-email" type="email" placeholder="Enter your email">
+        <label for="firebase-pass">Password</label>
+        <input id="firebase-pass" type="password" placeholder="Password">
+      </div>
+
+      <div style="display:flex;gap:7px;justify-content:space-between;margin-bottom:.7rem">
+        <button class="fauth-btn"
+                style="background:#7c6dfa;color:#fff;flex:1;padding:.65rem 0;font-size:.97rem;margin-bottom:0"
+                onclick="doEmailLogin()">Login</button>
+        <button class="fauth-btn"
+                style="background:#1c2436;color:#f0f7fd;flex:1;padding:.65rem 0;font-size:.97rem;border:1px solid #292d33;margin-bottom:0"
+                onclick="doRegister()">Register</button>
+      </div>
+
+      <div class="fauth-error" id="firebaseAuthError"></div>
+    </div>
+  </div>
+
+  <!-- AI Button -->
+  <button class="ai-fab-btn" onclick="alert('AI assistant coming soon!')">🤖 Ask AI</button>
+
+<!-- ============================================================
+     FIREBASE AUTHENTICATION SCRIPT
+============================================================ -->
+<script>
+  /* ---------- 1. Your Firebase Configuration ---------- */
+  const firebaseConfig = {
+    apiKey: "AIzaSyBVdI7OjdSwiSN3C47sanSmj0BeX5acBKc",
+    authDomain: "chemphys3d.firebaseapp.com",
+    projectId: "chemphys3d",
+    storageBucket: "chemphys3d.firebasestorage.app",
+    messagingSenderId: "242382321033",
+    appId: "1:242382321033:web:a2b9401f354fe1c052dd58",
+    measurementId: "G-FDERFP24KP"
+  };
+
+  /* ---------- 2. Initialize Firebase ---------- */
+  firebase.initializeApp(firebaseConfig);
+  if (firebase.analytics) firebase.analytics();   // optional analytics
+  const auth = firebase.auth();
+
+  /* ---------- 3. Helpers ---------- */
+  const $ = id => document.getElementById(id);
+  const showError = msg => { $('firebaseAuthError').textContent = msg || ''; };
+
+  function openAuthModal()  { $('firebaseAuthModal').classList.add('show'); }
+  function closeAuthModal() { $('firebaseAuthModal').classList.remove('show'); showError(''); }
+
+  function showSite(user) {
+    // Hide modal, show site + top bar
+    closeAuthModal();
+    $('topBar').style.display       = 'flex';
+    $('siteContent').style.display  = 'block';
+
+    // Fill user info in the upper-left
+    const name  = user.displayName || (user.email ? user.email.split('@')[0] : 'User');
+    const email = user.email || '';
+    $('userName').textContent  = name;
+    $('userEmail').textContent = email;
+
+    // Avatar: Google photo OR first letter
+    const avatar = $('userAvatar');
+    if (user.photoURL) {
+      avatar.outerHTML = `<img id="userAvatar" src="${user.photoURL}" alt="avatar"
+                               style="width:34px;height:34px;border-radius:50%;object-fit:cover;">`;
+    } else {
+      avatar.textContent = name.charAt(0).toUpperCase();
+    }
+  }
+
+  function hideSite() {
+    $('topBar').style.display      = 'none';
+    $('siteContent').style.display = 'none';
+    openAuthModal();
+  }
+
+  /* ---------- 4. Auth Actions ---------- */
+  function googleSignIn() {
+    showError('');
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider)
+        .catch(err => showError(err.message));
+  }
+
+  function doEmailLogin() {
+    showError('');
+    const email = $('firebase-email').value.trim();
+    const pass  = $('firebase-pass').value;
+    if (!email || !pass) return showError('Please fill in both fields.');
+    auth.signInWithEmailAndPassword(email, pass)
+        .catch(err => showError(err.message));
+  }
+
+  function doRegister() {
+    showError('');
+    const email = $('firebase-email').value.trim();
+    const pass  = $('firebase-pass').value;
+    if (!email || !pass) return showError('Please fill in both fields.');
+    if (pass.length < 6)  return showError('Password must be at least 6 characters.');
+    auth.createUserWithEmailAndPassword(email, pass)
+        .then(cred => {
+          // optional: set a display name from the email prefix
+          return cred.user.updateProfile({ displayName: email.split('@')[0] });
+        })
+        .catch(err => showError(err.message));
+  }
+
+  function doLogout() {
+    auth.signOut();
+  }
+
+  /* ---------- 5. Auth State Listener ----------
+     Fires automatically on page load AND on every login/logout.
+     This is what makes the user name appear in the upper-left
+     immediately after signing in. */
+  auth.onAuthStateChanged(user => {
+    if (user) showSite(user);
+    else      hideSite();
+  });
+</script>
+
+</body>
+</html>
