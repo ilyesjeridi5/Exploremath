@@ -1,11 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ExploreMath — Math · Physics · Robotics</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-<style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ExploreMath — Math · Physics · Robotics</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+  <!-- 🔥 Firebase v8 compat SDKs (must load BEFORE your own scripts) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
+<head>
+  <body>
+
+  <!-- 👇 PASTE THE TOP BAR HERE — first thing inside <body> -->
+  <div class="top-bar" id="topBar" style="display:none;">
+    <div class="user-pill">
+      <div class="avatar" id="userAvatar">U</div>
+      <div>
+        <span class="uname" id="userName">User</span>
+        <span class="uemail" id="userEmail"></span>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">Logout</button>
+  </div>
+  <!-- 👆 END OF TOP BAR -->
+
+
+  <!-- Your existing site content (hero, sections, etc.) stays below -->
+  ...
+
+
+  <!-- Your existing auth modal stays where it is -->
+  <div id="firebaseAuthModal"> ... </div>
+
+</body>
+  <style>
 :root{
   --bg:#07090f;--surface:#0e1118;--s2:#151b27;--s3:#1c2436;
   --accent:#7c6dfa;--a2:#3dd6f5;--green:#2de8a2;--orange:#ff8c42;--red:#ff5e6d;
@@ -1220,7 +1252,12 @@ stats();renderPosts();renderEx();
   applyLangUI();
   // Load all data from Google Sheets
   loadAllData();
-})();
+})(); 
+  auth.onAuthStateChanged(user => {
+  if (user) showSite(user);   // logged in → show site + username top-left
+  else      hideSite();        // logged out → show login modal
+});
 </script>
+ 
 </body>
 </html>
