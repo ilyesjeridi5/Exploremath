@@ -1234,279 +1234,181 @@ stats();renderPosts();renderEx();
 })();
 
  </script>
- <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Firebase Email Auth</title>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Auth Page</title>
+    <!-- You can optionally put the <style> block here, or link to a .css file -->
     <style>
-      /* This CSS is embedded for convenience. You can move it to a separate .css file if you prefer. */
-      body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-        background-color: #f8f8f8;
-      }
-      .container {
-        max-width: 400px;
-        margin: 50px auto;
-        padding: 20px 30px;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        background-color: #fff;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      }
-      h2 {
-        text-align: center;
-        margin-bottom: 25px;
-        color: #333;
-      }
-      label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: bold;
-        color: #555;
-      }
-      input[type="email"],
-      input[type="password"] {
-        width: calc(100% - 22px); /* Account for padding */
-        padding: 12px;
-        margin-bottom: 20px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        box-sizing: border-box; /* Include padding in width */
-        font-size: 16px;
-      }
-      .auth-buttons {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px; /* Space between buttons */
-        flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
-      }
-      button {
-        flex: 1; /* Allow buttons to grow and shrink */
-        padding: 12px 18px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-        font-weight: bold;
-        transition: background-color 0.2s ease;
-        min-width: 100px; /* Ensure buttons are not too small */
-      }
-      button#signUpButton,
-      button#signInButton {
-        background-color: #007bff; /* Primary blue */
-        color: white;
-      }
-      button#signUpButton:hover,
-      button#signInButton:hover {
-        background-color: #0056b3;
-      }
-      button#signOutButton {
-        background-color: #dc3545; /* Red for danger/sign-out */
-        color: white;
-        display: none; /* Hidden by default */
-      }
-      button#signOutButton:hover {
-        background-color: #c82333;
-      }
-      #message {
-        margin-top: 20px;
-        padding: 12px;
-        border-radius: 5px;
-        background-color: #e9ecef;
-        border: 1px solid #ced4da;
-        text-align: center;
-        font-size: 15px;
-      }
-      .error {
-        background-color: #f8d7da;
-        border-color: #f5c6cb;
-        color: #721c24;
-      }
-      .success {
-        background-color: #d4edda;
-        border-color: #c3e6cb;
-        color: #155724;
-      }
-      #currentUserStatus {
-        margin-top: 20px;
-        text-align: center;
-        font-size: 15px;
-        color: #6c757d;
-      }
+        /* CSS styles from the previous example for .container, input, button, etc. */
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f8f8f8; }
+        .container {
+            max-width: 400px; margin: 50px auto; padding: 20px 30px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        h2 { text-align: center; margin-bottom: 25px; color: #333; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+        input[type="email"], input[type="password"] {
+            width: calc(100% - 22px); padding: 12px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 16px;
+        }
+        .auth-buttons {
+            display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+        }
+        button {
+            flex: 1; padding: 12px 18px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; transition: background-color 0.2s ease; min-width: 100px;
+        }
+        button#signUpButton, button#signInButton { background-color: #007bff; color: white; }
+        button#signUpButton:hover, button#signInButton:hover { background-color: #0056b3; }
+        button#signOutButton { background-color: #dc3545; color: white; display: none; }
+        button#signOutButton:hover { background-color: #c82333; }
+        #message {
+            margin-top: 20px; padding: 12px; border-radius: 5px; background-color: #e9ecef; border: 1px solid #ced4da; text-align: center; font-size: 15px;
+        }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+        #currentUserStatus { margin-top: 20px; text-align: center; font-size: 15px; color: #6c757d; }
     </style>
-  </head>
-  <body>
-    <!-- This is the HTML for the authentication form -->
+</head>
+<body>
+
+    <!-- This is the HTML for the authentication form. It MUST be inside <body> -->
     <div class="container">
-      <h2>Firebase Email/Password Authentication</h2>
+        <h2>Firebase Email/Password Authentication</h2>
 
-      <div id="message"></div>
+        <div id="message"></div>
 
-      <form id="authForm">
-        <label for="email">Email:</label>
-        <input
-          type="email"
-          id="email"
-          required
-          placeholder="your@example.com"
-        />
+        <form id="authForm">
+            <label for="email">Email:</label>
+            <input type="email" id="email" required placeholder="your@example.com">
 
-        <label for="password">Password:</label>
-        <input
-          type="password"
-          id="password"
-          required
-          placeholder="min 6 characters"
-        />
+            <label for="password">Password:</label>
+            <input type="password" id="password" required placeholder="min 6 characters">
 
-        <div class="auth-buttons">
-          <button type="button" id="signUpButton">Sign Up</button>
-          <button type="button" id="signInButton">Sign In</button>
-          <button type="button" id="signOutButton">Sign Out</button>
-        </div>
-      </form>
+            <div class="auth-buttons">
+                <button type="button" id="signUpButton">Sign Up</button>
+                <button type="button" id="signInButton">Sign In</button>
+                <button type="button" id="signOutButton">Sign Out</button>
+            </div>
+        </form>
 
-      <p id="currentUserStatus">Not signed in.</p>
+        <p id="currentUserStatus">Not signed in.</p>
     </div>
 
     <!-- START of Firebase Authentication Code Block -->
-    <!-- This entire block should be pasted just before your closing </body> tag -->
+    <!-- This entire block contains your JavaScript and Firebase SDKs -->
+    <!-- It MUST be placed just before the closing </body> tag. -->
 
     <!-- Firebase SDKs - These must be loaded first -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
     <script>
-      // YOUR FIREBASE CONFIGURATION - NOW WITH YOUR PROVIDED DETAILS!
-      const firebaseConfig = {
-        apiKey: "AIzaSyBVdI7OjdSwiSN3C47sanSmj0BeX5acBKc",
-        authDomain: "chemphys3d.firebaseapp.com",
-        projectId: "chemphys3d",
-        storageBucket: "chemphys3d.firebasestorage.app",
-        messagingSenderId: "242382321033",
-        appId: "1:242382321033:web:a2b9401f354fe1c052dd58",
-        measurementId: "G-FDERFP24KP",
-      };
+        // YOUR FIREBASE CONFIGURATION - Already included with your details!
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVdI7OjdSwiSN3C47sanSmj0BeX5acBKc",
+            authDomain: "chemphys3d.firebaseapp.com",
+            projectId: "chemphys3d",
+            storageBucket: "chemphys3d.firebasestorage.app",
+            messagingSenderId: "242382321033",
+            appId: "1:242382321033:web:a2b9401f354fe1c052dd58",
+            measurementId: "G-FDERFP24KP"
+        };
 
-      // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
 
-      // Get Firebase Auth instance
-      const auth = firebase.auth();
+        // Get references to HTML elements
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const signUpButton = document.getElementById('signUpButton');
+        const signInButton = document.getElementById('signInButton');
+        const signOutButton = document.getElementById('signOutButton');
+        const messageDiv = document.getElementById('message');
+        const currentUserStatus = document.getElementById('currentUserStatus');
 
-      // Get references to HTML elements
-      const emailInput = document.getElementById("email");
-      const passwordInput = document.getElementById("password");
-      const signUpButton = document.getElementById("signUpButton");
-      const signInButton = document.getElementById("signInButton");
-      const signOutButton = document.getElementById("signOutButton");
-      const messageDiv = document.getElementById("message");
-      const currentUserStatus = document.getElementById("currentUserStatus");
-
-      // Function to display messages
-      function displayMessage(msg, isError = false) {
-        if (messageDiv) {
-          messageDiv.textContent = msg;
-          messageDiv.className = isError ? "error" : "success";
-        } else {
-          console.warn("Message div not found. Message:", msg);
+        // Function to display messages
+        function displayMessage(msg, isError = false) {
+            if (messageDiv) {
+                messageDiv.textContent = msg;
+                messageDiv.className = isError ? 'error' : 'success';
+            } else {
+                console.warn("Message div not found. Message:", msg);
+            }
         }
-      }
 
-      // Event listener for Sign Up button
-      if (signUpButton) {
-        signUpButton.addEventListener("click", () => {
-          const email = emailInput ? emailInput.value : "";
-          const password = passwordInput ? passwordInput.value : "";
-
-          if (!email || !password) {
-            displayMessage("Please enter both email and password.", true);
-            return;
-          }
-
-          auth
-            .createUserWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-              const user = userCredential.user;
-              displayMessage(
-                `Successfully signed up and logged in as ${user.email}!`,
-                false
-              );
-              emailInput.value = ""; // Clear form
-              passwordInput.value = ""; // Clear form
-            })
-            .catch((error) => {
-              const errorMessage = error.message;
-              displayMessage(`Sign up failed: ${errorMessage}`, true);
-              console.error("Sign up error:", error.code, errorMessage);
+        // Event listener for Sign Up button
+        if (signUpButton) {
+            signUpButton.addEventListener('click', () => {
+                const email = emailInput ? emailInput.value : '';
+                const password = passwordInput ? passwordInput.value : '';
+                if (!email || !password) { displayMessage('Please enter both email and password.', true); return; }
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        const user = userCredential.user;
+                        displayMessage(`Successfully signed up and logged in as ${user.email}!`, false);
+                        emailInput.value = ''; passwordInput.value = '';
+                    })
+                    .catch((error) => {
+                        const errorMessage = error.message;
+                        displayMessage(`Sign up failed: ${errorMessage}`, true);
+                        console.error("Sign up error:", error.code, errorMessage);
+                    });
             });
-        });
-      }
-
-      // Event listener for Sign In button
-      if (signInButton) {
-        signInButton.addEventListener("click", () => {
-          const email = emailInput ? emailInput.value : "";
-          const password = passwordInput ? passwordInput.value : "";
-
-          if (!email || !password) {
-            displayMessage("Please enter both email and password.", true);
-            return;
-          }
-
-          auth
-            .signInWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-              const user = userCredential.user;
-              displayMessage(`Successfully signed in as ${user.email}!`, false);
-              emailInput.value = ""; // Clear form
-              passwordInput.value = ""; // Clear form
-            })
-            .catch((error) => {
-              const errorMessage = error.message;
-              displayMessage(`Sign in failed: ${errorMessage}`, true);
-              console.error("Sign in error:", error.code, errorMessage);
-            });
-        });
-      }
-
-      // Event listener for Sign Out button
-      if (signOutButton) {
-        signOutButton.addEventListener("click", () => {
-          auth
-            .signOut()
-            .then(() => {
-              displayMessage("Successfully signed out.", false);
-              emailInput.value = ""; // Clear form
-              passwordInput.value = ""; // Clear form
-            })
-            .catch((error) => {
-              displayMessage(`Sign out failed: ${error.message}`, true);
-              console.error("Sign out error:", error);
-            });
-        });
-      }
-
-      // Listen for authentication state changes (user logs in/out)
-      auth.onAuthStateChanged((user) => {
-        if (user) {
-          if (currentUserStatus)
-            currentUserStatus.textContent = `Currently signed in as: ${user.email} (UID: ${user.uid})`;
-          if (signUpButton) signUpButton.style.display = "none";
-          if (signInButton) signInButton.style.display = "none";
-          if (signOutButton) signOutButton.style.display = "inline-block";
-          if (messageDiv) displayMessage(""); // Clear message on state change
-        } else {
-          if (currentUserStatus)
-            currentUserStatus.textContent = "Not signed in.";
-          if (signUpButton) signUpButton.style.display = "inline-block";
-          if (signInButton) signInButton.style.display = "inline-block";
-          if (signOutButton) signOutButton.style.display = "none";
-          if (messageDiv) displayMessage(""); // Clear message on state change
         }
-      });
+
+        // Event listener for Sign In button
+        if (signInButton) {
+            signInButton.addEventListener('click', () => {
+                const email = emailInput ? emailInput.value : '';
+                const password = passwordInput ? passwordInput.value : '';
+                if (!email || !password) { displayMessage('Please enter both email and password.', true); return; }
+                auth.signInWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        const user = userCredential.user;
+                        displayMessage(`Successfully signed in as ${user.email}!`, false);
+                        emailInput.value = ''; passwordInput.value = '';
+                    })
+                    .catch((error) => {
+                        const errorMessage = error.message;
+                        displayMessage(`Sign in failed: ${errorMessage}`, true);
+                        console.error("Sign in error:", error.code, errorMessage);
+                    });
+            });
+        }
+
+        // Event listener for Sign Out button
+        if (signOutButton) {
+            signOutButton.addEventListener('click', () => {
+                auth.signOut().then(() => {
+                    displayMessage('Successfully signed out.', false);
+                    emailInput.value = ''; passwordInput.value = '';
+                }).catch((error) => {
+                    displayMessage(`Sign out failed: ${error.message}`, true);
+                    console.error("Sign out error:", error);
+                });
+            });
+        }
+
+        // Listen for authentication state changes (user logs in/out)
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                if (currentUserStatus) currentUserStatus.textContent = `Currently signed in as: ${user.email} (UID: ${user.uid})`;
+                if (signUpButton) signUpButton.style.display = 'none';
+                if (signInButton) signInButton.style.display = 'none';
+                if (signOutButton) signOutButton.style.display = 'inline-block';
+                if (messageDiv) displayMessage('');
+            } else {
+                if (currentUserStatus) currentUserStatus.textContent = 'Not signed in.';
+                if (signUpButton) signUpButton.style.display = 'inline-block';
+                if (signInButton) signInButton.style.display = 'inline-block';
+                if (signOutButton) signOutButton.style.display = 'none';
+                if (messageDiv) displayMessage('');
+            }
+        });
     </script>
     <!-- END of Firebase Authentication Code Block -->
+
   
 </body>
 </html>
