@@ -1,6 +1,327 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Secured Website</title>
+    <style>
+      /* General Body Styling */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background-color: #f8f8f8;
+        color: #333;
+      }
+
+      /* Styles for the Authentication Form Container */
+      .auth-container {
+        max-width: 400px;
+        margin: 50px auto;
+        padding: 20px 30px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        background-color: #fff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        /* Authentication form is visible by default when not logged in */
+      }
+      .auth-container h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        color: #333;
+      }
+      .auth-container label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #555;
+      }
+      .auth-container input[type="email"],
+      .auth-container input[type="password"] {
+        width: calc(100% - 22px);
+        padding: 12px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+        font-size: 16px;
+      }
+      .auth-container .auth-buttons {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .auth-container button {
+        flex: 1;
+        padding: 12px 18px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        transition: background-color 0.2s ease;
+        min-width: 100px;
+      }
+      .auth-container button#signUpButton,
+      .auth-container button#signInButton {
+        background-color: #007bff;
+        color: white;
+      }
+      .auth-container button#signUpButton:hover,
+      .auth-container button#signInButton:hover {
+        background-color: #0056b3;
+      }
+      .auth-container button#signOutButton {
+        background-color: #dc3545;
+        color: white;
+        display: none;
+      }
+      .auth-container button#signOutButton:hover {
+        background-color: #c82333;
+      }
+      .auth-container #message {
+        margin-top: 20px;
+        padding: 12px;
+        border-radius: 5px;
+        background-color: #e9ecef;
+        border: 1px solid #ced4da;
+        text-align: center;
+        font-size: 15px;
+      }
+      .auth-container .error {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+        color: #721c24;
+      }
+      .auth-container .success {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        color: #155724;
+      }
+      .auth-container #currentUserStatus {
+        margin-top: 20px;
+        text-align: center;
+        font-size: 15px;
+        color: #6c757d;
+      }
+
+      /* Styling for the Main Site Content */
+      #mainSiteContent {
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 30px;
+        background-color: #e6ffe6;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        /* Initially hidden by CSS - will be shown by JS on successful login */
+        display: none;
+      }
+      #mainSiteContent h1,
+      h3 {
+        color: #28a745;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- This is the Authentication Form, visible until logged in -->
+    <div class="auth-container" id="authFormContainer">
+      <h2>Please Sign In or Sign Up</h2>
+
+      <div id="message"></div>
+
+      <form id="authForm">
+        <label for="email">Email:</label>
+        <input
+          type="email"
+          id="email"
+          required
+          placeholder="your@example.com"
+        />
+
+        <label for="password">Password:</label>
+        <input
+          type="password"
+          id="password"
+          required
+          placeholder="min 6 characters"
+        />
+
+        <div class="auth-buttons">
+          <button type="button" id="signUpButton">Sign Up</button>
+          <button type="button" id="signInButton">Sign In</button>
+          <button type="button" id="signOutButton">Sign Out</button>
+        </div>
+      </form>
+
+      <p id="currentUserStatus">Not signed in.</p>
+    </div>
+
+    <!-- THIS IS WHERE ALL YOUR MAIN WEBSITE CONTENT SHOULD GO -->
+    <!-- It will be hidden until the user logs in -->
+    <div id="mainSiteContent">
+      <h1>Welcome to the Secured Area of Your Website!</h1>
+      <p>Congratulations, you are logged in!</p>
+      <p>This content should only be visible to authenticated users.</p>
+
+      <h3>Your Awesome Features Here:</h3>
+      <ul>
+        <li>Personalized Dashboard</li>
+        <li>Exclusive Content</li>
+        <li>User Profile Management</li>
+      </ul>
+      <p>Feel free to explore.</p>
+
+      <!-- You can also place your Logout button here if you want it within the main content -->
+      <!-- <button type="button" id="signOutButtonMainContent">Log Out</button> -->
+    </div>
+
+    <!-- START of Firebase Authentication Code Block -->
+    <!-- This entire block contains your JavaScript and Firebase SDKs -->
+    <!-- It MUST be placed just before the closing </body> tag. -->
+
+    <!-- Firebase SDKs - These must be loaded first -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+    <script>
+      // YOUR FIREBASE CONFIGURATION - Already included with your details!
+      const firebaseConfig = {
+        apiKey: "AIzaSyBVdI7OjdSwiSN3C47sanSmj0BeX5acBKc",
+        authDomain: "chemphys3d.firebaseapp.com",
+        projectId: "chemphys3d",
+        storageBucket: "chemphys3d.firebasestorage.app",
+        messagingSenderId: "242382321033",
+        appId: "1:242382321033:web:a2b9401f354fe1c052dd58",
+        measurementId: "G-FDERFP24KP",
+      };
+
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+
+      // Get references to HTML elements
+      const emailInput = document.getElementById("email");
+      const passwordInput = document.getElementById("password");
+      const signUpButton = document.getElementById("signUpButton");
+      const signInButton = document.getElementById("signInButton");
+      const signOutButton = document.getElementById("signOutButton");
+      const messageDiv = document.getElementById("message");
+      const currentUserStatus = document.getElementById("currentUserStatus");
+
+      // New references for show/hide functionality of main content
+      const authFormContainer = document.getElementById("authFormContainer");
+      const mainSiteContent = document.getElementById("mainSiteContent");
+
+      // Function to display messages
+      function displayMessage(msg, isError = false) {
+        if (messageDiv) {
+          messageDiv.textContent = msg;
+          messageDiv.className = isError ? "error" : "success";
+        } else {
+          console.warn("Message div not found. Message:", msg);
+        }
+      }
+
+      // Event listener for Sign Up button
+      if (signUpButton) {
+        signUpButton.addEventListener("click", () => {
+          const email = emailInput ? emailInput.value : "";
+          const password = passwordInput ? passwordInput.value : "";
+          if (!email || !password) {
+            displayMessage("Please enter both email and password.", true);
+            return;
+          }
+          auth
+            .createUserWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+              const user = userCredential.user;
+              displayMessage(
+                `Successfully signed up and logged in as ${user.email}!`,
+                false
+              );
+              emailInput.value = "";
+              passwordInput.value = "";
+            })
+            .catch((error) => {
+              const errorMessage = error.message;
+              displayMessage(`Sign up failed: ${errorMessage}`, true);
+              console.error("Sign up error:", error.code, errorMessage);
+            });
+        });
+      }
+
+      // Event listener for Sign In button
+      if (signInButton) {
+        signInButton.addEventListener("click", () => {
+          const email = emailInput ? emailInput.value : "";
+          const password = passwordInput ? passwordInput.value : "";
+          if (!email || !password) {
+            displayMessage("Please enter both email and password.", true);
+            return;
+          }
+          auth
+            .signInWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+              const user = userCredential.user;
+              displayMessage(`Successfully signed in as ${user.email}!`, false);
+              emailInput.value = "";
+              passwordInput.value = "";
+            })
+            .catch((error) => {
+              const errorMessage = error.message;
+              displayMessage(`Sign in failed: ${errorMessage}`, true);
+              console.error("Sign in error:", error.code, errorMessage);
+            });
+        });
+      }
+
+      // Event listener for Sign Out button
+      if (signOutButton) {
+        signOutButton.addEventListener("click", () => {
+          auth
+            .signOut()
+            .then(() => {
+              displayMessage("Successfully signed out.", false);
+              emailInput.value = "";
+              passwordInput.value = "";
+            })
+            .catch((error) => {
+              displayMessage(`Sign out failed: ${error.message}`, true);
+              console.error("Sign out error:", error);
+            });
+        });
+      }
+
+      // Listen for authentication state changes (user logs in/out)
+      auth.onAuthStateChanged((user) => {
+        if (user) {
+          // User is signed in
+          if (currentUserStatus)
+            currentUserStatus.textContent = `Currently signed in as: ${user.email} (UID: ${user.uid})`;
+          if (signUpButton) signUpButton.style.display = "none";
+          if (signInButton) signInButton.style.display = "none";
+          if (signOutButton) signOutButton.style.display = "inline-block"; // Show logout button in auth form
+          if (messageDiv) displayMessage(""); // Clear any auth messages
+
+          // Hide the auth form and show the main site content
+          if (authFormContainer) authFormContainer.style.display = "none";
+          if (mainSiteContent) mainSiteContent.style.display = "block"; // Or 'flex', 'grid', depending on your layout
+        } else {
+          // User is signed out
+          if (currentUserStatus)
+            currentUserStatus.textContent = "Not signed in.";
+          if (signUpButton) signUpButton.style.display = "inline-block";
+          if (signInButton) signInButton.style.display = "inline-block";
+          if (signOutButton) signOutButton.style.display = "none"; // Hide logout button in auth form
+          if (messageDiv) displayMessage(""); // Clear any auth messages
+
+          // Show the auth form and hide the main site content
+          if (authFormContainer) authFormContainer.style.display = "block"; // Or 'flex'
+          if (mainSiteContent) mainSiteContent.style.display = "none";
+        }
+      });
+    </script>
+    <!-- END of Firebase Authentication Code Block -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ExploreMath — Math · Physics · Robotics</title>
@@ -1233,182 +1554,6 @@ stats();renderPosts();renderEx();
   loadAllData();
 })();
 
- </script>
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Firebase Auth Page</title>
-    <!-- You can optionally put the <style> block here, or link to a .css file -->
-    <style>
-        /* CSS styles from the previous example for .container, input, button, etc. */
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f8f8f8; }
-        .container {
-            max-width: 400px; margin: 50px auto; padding: 20px 30px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-        h2 { text-align: center; margin-bottom: 25px; color: #333; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
-        input[type="email"], input[type="password"] {
-            width: calc(100% - 22px); padding: 12px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 16px;
-        }
-        .auth-buttons {
-            display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap;
-        }
-        button {
-            flex: 1; padding: 12px 18px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; transition: background-color 0.2s ease; min-width: 100px;
-        }
-        button#signUpButton, button#signInButton { background-color: #007bff; color: white; }
-        button#signUpButton:hover, button#signInButton:hover { background-color: #0056b3; }
-        button#signOutButton { background-color: #dc3545; color: white; display: none; }
-        button#signOutButton:hover { background-color: #c82333; }
-        #message {
-            margin-top: 20px; padding: 12px; border-radius: 5px; background-color: #e9ecef; border: 1px solid #ced4da; text-align: center; font-size: 15px;
-        }
-        .error { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
-        .success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
-        #currentUserStatus { margin-top: 20px; text-align: center; font-size: 15px; color: #6c757d; }
-    </style>
-</head>
-<body>
-
-    <!-- This is the HTML for the authentication form. It MUST be inside <body> -->
-    <div class="container">
-        <h2>Firebase Email/Password Authentication</h2>
-
-        <div id="message"></div>
-
-        <form id="authForm">
-            <label for="email">Email:</label>
-            <input type="email" id="email" required placeholder="your@example.com">
-
-            <label for="password">Password:</label>
-            <input type="password" id="password" required placeholder="min 6 characters">
-
-            <div class="auth-buttons">
-                <button type="button" id="signUpButton">Sign Up</button>
-                <button type="button" id="signInButton">Sign In</button>
-                <button type="button" id="signOutButton">Sign Out</button>
-            </div>
-        </form>
-
-        <p id="currentUserStatus">Not signed in.</p>
-    </div>
-
-    <!-- START of Firebase Authentication Code Block -->
-    <!-- This entire block contains your JavaScript and Firebase SDKs -->
-    <!-- It MUST be placed just before the closing </body> tag. -->
-
-    <!-- Firebase SDKs - These must be loaded first -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
-    <script>
-        // YOUR FIREBASE CONFIGURATION - Already included with your details!
-        const firebaseConfig = {
-            apiKey: "AIzaSyBVdI7OjdSwiSN3C47sanSmj0BeX5acBKc",
-            authDomain: "chemphys3d.firebaseapp.com",
-            projectId: "chemphys3d",
-            storageBucket: "chemphys3d.firebasestorage.app",
-            messagingSenderId: "242382321033",
-            appId: "1:242382321033:web:a2b9401f354fe1c052dd58",
-            measurementId: "G-FDERFP24KP"
-        };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-
-        // Get references to HTML elements
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
-        const signUpButton = document.getElementById('signUpButton');
-        const signInButton = document.getElementById('signInButton');
-        const signOutButton = document.getElementById('signOutButton');
-        const messageDiv = document.getElementById('message');
-        const currentUserStatus = document.getElementById('currentUserStatus');
-
-        // Function to display messages
-        function displayMessage(msg, isError = false) {
-            if (messageDiv) {
-                messageDiv.textContent = msg;
-                messageDiv.className = isError ? 'error' : 'success';
-            } else {
-                console.warn("Message div not found. Message:", msg);
-            }
-        }
-
-        // Event listener for Sign Up button
-        if (signUpButton) {
-            signUpButton.addEventListener('click', () => {
-                const email = emailInput ? emailInput.value : '';
-                const password = passwordInput ? passwordInput.value : '';
-                if (!email || !password) { displayMessage('Please enter both email and password.', true); return; }
-                auth.createUserWithEmailAndPassword(email, password)
-                    .then((userCredential) => {
-                        const user = userCredential.user;
-                        displayMessage(`Successfully signed up and logged in as ${user.email}!`, false);
-                        emailInput.value = ''; passwordInput.value = '';
-                    })
-                    .catch((error) => {
-                        const errorMessage = error.message;
-                        displayMessage(`Sign up failed: ${errorMessage}`, true);
-                        console.error("Sign up error:", error.code, errorMessage);
-                    });
-            });
-        }
-
-        // Event listener for Sign In button
-        if (signInButton) {
-            signInButton.addEventListener('click', () => {
-                const email = emailInput ? emailInput.value : '';
-                const password = passwordInput ? passwordInput.value : '';
-                if (!email || !password) { displayMessage('Please enter both email and password.', true); return; }
-                auth.signInWithEmailAndPassword(email, password)
-                    .then((userCredential) => {
-                        const user = userCredential.user;
-                        displayMessage(`Successfully signed in as ${user.email}!`, false);
-                        emailInput.value = ''; passwordInput.value = '';
-                    })
-                    .catch((error) => {
-                        const errorMessage = error.message;
-                        displayMessage(`Sign in failed: ${errorMessage}`, true);
-                        console.error("Sign in error:", error.code, errorMessage);
-                    });
-            });
-        }
-
-        // Event listener for Sign Out button
-        if (signOutButton) {
-            signOutButton.addEventListener('click', () => {
-                auth.signOut().then(() => {
-                    displayMessage('Successfully signed out.', false);
-                    emailInput.value = ''; passwordInput.value = '';
-                }).catch((error) => {
-                    displayMessage(`Sign out failed: ${error.message}`, true);
-                    console.error("Sign out error:", error);
-                });
-            });
-        }
-
-        // Listen for authentication state changes (user logs in/out)
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                if (currentUserStatus) currentUserStatus.textContent = `Currently signed in as: ${user.email} (UID: ${user.uid})`;
-                if (signUpButton) signUpButton.style.display = 'none';
-                if (signInButton) signInButton.style.display = 'none';
-                if (signOutButton) signOutButton.style.display = 'inline-block';
-                if (messageDiv) displayMessage('');
-            } else {
-                if (currentUserStatus) currentUserStatus.textContent = 'Not signed in.';
-                if (signUpButton) signUpButton.style.display = 'inline-block';
-                if (signInButton) signInButton.style.display = 'inline-block';
-                if (signOutButton) signOutButton.style.display = 'none';
-                if (messageDiv) displayMessage('');
-            }
-        });
-    </script>
-    <!-- END of Firebase Authentication Code Block -->
-
-  
+ </script> 
 </body>
 </html>
